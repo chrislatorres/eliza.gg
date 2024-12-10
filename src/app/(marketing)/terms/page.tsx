@@ -1,4 +1,9 @@
 import Markdown from "markdown-to-jsx";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Eliza.gg - Terms of Service",
+};
 
 export default function Page() {
   const termsOfService = `
@@ -27,16 +32,27 @@ It is your responsibility to ensure compliance with the open-source license unde
 2.2 **Accuracy of Information**
 While we strive to provide accurate and up-to-date information, we do not guarantee the completeness, accuracy, or reliability of the Resources.
 
-**3. Content Usage**
+**3. Content Usage and AI Interactions**
 --------------------
 
 3.1 **Permitted Use**
 You may use the Resources to develop, deploy, and manage projects based on the Eliza framework. You may not use the Resources to misrepresent affiliation with the Eliza project or Cogend.
 
-3.2 **Prohibited Use**
-You agree not to use the Resources to:
-- Develop content or projects that violate any applicable laws or third-party rights.
-- Misrepresent the purpose or functionality of the Eliza framework.
+3.2 **AI-Generated Content**
+Our services may utilize AI technologies to generate responses and assist users. Due to the nature of AI products, responses may not be unique to you and may be similar to output provided to other users. You acknowledge that AI-generated content should be reviewed for accuracy and appropriateness before use.
+
+3.3 **Prohibited Use**
+You agree not to use the Resources or our AI features to:
+- Develop content or projects that violate any applicable laws or third-party rights
+- Misrepresent the purpose or functionality of the Eliza framework
+- Create or disseminate misinformation, deepfakes, or deceptive content
+- Generate hate speech, harmful content, or content that promotes violence
+- Attempt prompt injection or discovery of our system prompts
+- Create age-inappropriate or harmful content relating to minors
+- Develop facial recognition databases or make inferences about personal characteristics
+- Submit personal information that violates privacy laws
+- Engage in spam, content-farming, or click-bait activities
+- Represent AI-generated content as human-generated without disclosure
 
 **4. Intellectual Property**
 ----------------------------
@@ -69,10 +85,53 @@ Your use of the Resources is at your own risk. Cogend is not liable for any dama
 6.2 **Limit of Liability**
 To the fullest extent permitted by law, Cogend’s liability is limited to the extent of any fees paid (if applicable) for access to these Resources.
 
-**7. Changes to Terms**
+**7. AI Data Usage and Privacy**
+------------------------------
+
+7.1 **Data Collection**
+We may collect and process user interactions, including prompts, queries, and feedback, to improve our services and AI models. This data collection is governed by our Privacy Policy.
+
+7.2 **Third-Party AI Services**
+Our platform may utilize third-party AI services and models. Your use of our services is also subject to the applicable terms and policies of these providers.
+
+7.3 **AI Output Disclaimer**
+The AI models we use are trained on various data sources that may contain inaccuracies or biases. We recommend exercising discretion when using AI-generated content and reviewing all outputs before implementation or public use.
+
+**8. Security and Safety**
+-------------------------
+
+8.1 **AI Safety Measures**
+We implement reasonable measures to maintain user safety and prevent harm. However, you are responsible for reviewing and validating any AI-generated content or code before implementation.
+
+8.2 **Code Review**
+Any code generated through our AI features should undergo appropriate human review before commercial use to ensure suitability and mitigate risks of intellectual property infringement, bugs, or disclosure of proprietary information.
+
+**9. Changes to Terms**
 -----------------------
 
 We may update these Terms at any time. Changes will be effective upon posting to this page. Your continued use of the Resources constitutes acceptance of the updated Terms.
+
+**10. Payment Processing**
+--------------------------------------------
+
+When you make a purchase, payments are processed by a third-party provider (e.g., Stripe). We do not store your credit card details. You are responsible for ensuring that your payment information is accurate and up to date.
+
+We reserve the right to cancel any order if there is an issue with payment processing or fraud detection.
+
+**11. Pricing and Billing**
+----------------------------------
+
+Prices are displayed in USD and may be subject to applicable taxes based on your location. The total price, including any applicable taxes, will be displayed at checkout.
+
+**12. No Refunds Policy**
+-----------------------------------------
+
+All purchases are final and non-refundable. By making a purchase, you acknowledge and agree to this no-refund policy.
+
+**13. Changes to Terms**
+-----------------------
+
+We may update these Terms at any time. Changes will be effective upon posting to this page. Your continued use of the Services constitutes acceptance of the updated Terms.
   `;
 
   return (

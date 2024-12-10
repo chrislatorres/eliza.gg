@@ -1,6 +1,7 @@
 import { inter } from "@/app/fonts";
 import "@/app/globals.css";
 import { ProgressBar } from "@/app/progress-bar";
+import { Header } from "@/components/layout/header";
 import type { Metadata, Viewport } from "next";
 
 export const viewport: Viewport = {
@@ -10,7 +11,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Eliza Documentation",
+  title: "Eliza.gg - The Documentation for Eliza",
   description:
     "Eliza is a powerful multi-agent simulation framework designed to create, deploy, and manage autonomous AI agents.",
   icons: [
@@ -27,6 +28,12 @@ export const metadata: Metadata = {
       media: "(prefers-color-scheme: dark)",
     },
   ],
+  twitter: {
+    card: "summary_large_image",
+    title: "Eliza.gg - The Documentation for Eliza",
+    description:
+      "Eliza is a powerful multi-agent simulation framework designed to create, deploy, and manage autonomous AI agents.",
+  },
 };
 
 export default function RootLayout({
@@ -36,9 +43,10 @@ export default function RootLayout({
 }>) {
   return (
     <html suppressHydrationWarning lang="en" className={inter.className}>
-      <body className="min-h-dvh antialiased bg-black text-white scheme-dark dark">
+      <body className="min-h-dvh antialiased bg-white text-black scheme-light dark:bg-black dark:text-white dark:scheme-dark">
         <div className="flex min-h-dvh w-full flex-col grow">
           <div className="flex grow flex-col size-full min-h-dvh">
+            <Header />
             {children}
           </div>
         </div>

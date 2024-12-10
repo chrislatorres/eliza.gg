@@ -1,8 +1,13 @@
 import Markdown from "markdown-to-jsx";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Eliza.gg - Privacy Policy",
+};
 
 export default function Page() {
   const privacy = `
-**Cogend Privacy Policy**
+**Privacy Policy**
 =======================
 
 **Effective Date:** December 10th, 2024
@@ -129,42 +134,10 @@ We transfer data internationally in compliance with:
 
 Our Services are not intended for children under 13. We do not knowingly collect data from children under 13.
 
-**9. Changes to This Policy**
+**9. Changes to Privacy Policy**
 -------------------
 
-We will notify you of material changes to this policy.
-
-**10. Order Fulfillment and Payment Processing**
---------------------------------------------
-
-When you make a purchase, payments are processed by a third-party provider (e.g., Stripe). We do not store your credit card details. You are responsible for ensuring that your payment information is accurate and up to date.
-
-We reserve the right to cancel any order if there is an issue with payment processing, fraud detection, or product availability.
-
-**11. Shipping and Delivery**
----------------------------
-
-We work with trusted third-party carriers to ship your orders. Shipping costs and estimated delivery times will be displayed at checkout. Delivery times may vary based on your location, and we cannot guarantee specific delivery dates.
-
-**12. Refunds, Cancellations, and Exchanges**
------------------------------------------
-
-We do not offer refunds for purchased products. In case of defective or damaged products, you may contact our customer support team to request an exchange or store credit, subject to our discretion and our returns policy.
-
-**13. Product Availability and Accuracy**
--------------------------------------
-
-We strive to provide accurate product descriptions and availability, but we cannot guarantee that products will always be in stock. In the event that a product is unavailable, we reserve the right to cancel or modify your order, and we will notify you of such changes.
-
-**14. Tax and Currency Information**
-----------------------------------
-
-Prices are displayed in USD and may be subject to applicable sales tax based on your location. The total price, including tax and shipping, will be displayed at checkout.
-
-**1. Promotions and Discounts**
------------------------------
-
-We may offer promotional codes or discounts from time to time. These offers are subject to availability and may have an expiration date. Discount codes cannot be applied to certain products or combined with other offers unless stated otherwise.
+We will notify you of material changes to this Privacy Policy. Your continued use of the Services after such modifications constitutes acceptance of the updated Privacy Policy.
     `.trim();
 
   return (
