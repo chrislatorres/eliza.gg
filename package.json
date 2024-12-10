@@ -11,6 +11,7 @@
     "@heroicons/react": "^2.2.0",
     "@libsql/client": "^0.14.0",
     "@tailwindcss/postcss": "^4.0.0-beta.1",
+    "ai": "^4.0.13",
     "clsx": "^2.1.1",
     "eslint-plugin-path-alias": "^2.1.0",
     "eslint-plugin-tailwindcss": "^3.17.5",
