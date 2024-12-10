@@ -1,6 +1,7 @@
 import { chunkMarkdown } from "@/libs/indexer/utils/chunk-markdown";
 import { createTurso } from "@/libs/indexer/utils/create-turso";
 import { embedBatch } from "@/libs/indexer/utils/embed";
+import { hashString } from "@/libs/indexer/utils/hash";
 
 const turso = createTurso();
 
@@ -104,7 +105,7 @@ const insertOperations = markdownContentChunks.map((chunk, i) => ({
     VALUES (?, ?, ?, ?, vector32(?))
   `,
   args: [
-    Bun.hash.cityHash32(chunk.content),
+    hashString(chunk.content),
     chunk.metadata.title,
     chunk.metadata.url,
     chunk.content,

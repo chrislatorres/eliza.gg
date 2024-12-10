@@ -1,4 +1,5 @@
 import { createTurso } from "@/libs/indexer/utils/create-turso";
+import { hashString } from "@/libs/indexer/utils/hash";
 import { VoyageAIClient } from "voyageai";
 
 const client = new VoyageAIClient({ apiKey: process.env.VOYAGE_API_KEY });
@@ -20,7 +21,7 @@ await turso.execute(`
 console.timeEnd("create-table");
 export async function embed(text: string) {
   console.time(`embed-${text.slice(0, 10)}`);
-  const hash = Bun.hash.cityHash32(text);
+  const hash = hashString(text);
 
   // Check cache first
   console.time(`cache-check-${text.slice(0, 10)}`);
@@ -66,7 +67,7 @@ export async function embedBatch(texts: string[]) {
 
   console.time("embedBatch-cache-check");
   for (const text of texts) {
-    const hash = Bun.hash.cityHash32(text);
+    const hash = hashString(text);
     const cachedResult = await turso.execute({
       sql: "SELECT embedding FROM embedding_cache WHERE hash = ?",
       args: [hash],
@@ -98,7 +99,7 @@ export async function embedBatch(texts: string[]) {
   // Store new embeddings in cache asynchronously
   console.time("embedBatch-cache-store");
   nonCached.forEach((text, i) => {
-    const hash = Bun.hash.cityHash32(text);
+    const hash = hashString(text);
     turso
       .execute({
         sql: "INSERT OR IGNORE INTO embedding_cache (hash, text, embedding) VALUES (?, ?, ?)",
