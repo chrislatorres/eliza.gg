@@ -14,6 +14,13 @@ export const metadata: Metadata = {
   title: "Eliza.gg - The Documentation for Eliza",
   description:
     "Eliza is a powerful multi-agent simulation framework designed to create, deploy, and manage autonomous AI agents.",
+  openGraph: {
+    siteName: "Eliza.gg",
+    title: "Eliza.gg - The Documentation for Eliza",
+    description:
+      "Eliza is a powerful multi-agent simulation framework designed to create, deploy, and manage autonomous AI agents.",
+    images: ["/api/og"],
+  },
   icons: [
     {
       rel: "icon",
@@ -33,6 +40,7 @@ export const metadata: Metadata = {
     title: "Eliza.gg - The Documentation for Eliza",
     description:
       "Eliza is a powerful multi-agent simulation framework designed to create, deploy, and manage autonomous AI agents.",
+    images: ["/api/og"],
   },
 };
 
