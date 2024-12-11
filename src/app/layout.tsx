@@ -21,6 +21,9 @@ export const metadata: Metadata = {
     description:
       "Eliza is a powerful multi-agent simulation framework designed to create, deploy, and manage autonomous AI agents.",
     images: ["/api/og"],
+    type: "website",
+    url: "https://eliza.gg",
+    locale: "en_US",
   },
   icons: [
     {
@@ -38,10 +41,12 @@ export const metadata: Metadata = {
   ],
   twitter: {
     card: "summary_large_image",
-    title: "Eliza.gg - The Documentation for Eliza",
+    site: "Eliza.gg",
+    title: "The Documentation for Eliza",
     description:
       "Eliza is a powerful multi-agent simulation framework designed to create, deploy, and manage autonomous AI agents.",
     images: ["/api/og"],
+    creator: "@chrislatorres",
   },
 };
 

@@ -32,7 +32,7 @@ export async function GET() {
         }}
         tw="flex flex-col items-center justify-center w-full h-full bg-black text-white"
       >
-        <div tw="flex flex-col items-center justify-center w-full p-20">
+        <div tw="flex flex-col items-center justify-center w-full p-32">
           {/* Logo - reduced size and margin */}
           <img
             src={`${process.env.NEXT_PUBLIC_APP_URL}/eliza-white.png`}
@@ -48,14 +48,19 @@ export async function GET() {
               fontFamily: "Inter",
               fontWeight: "900",
             }}
-            tw="text-7xl font-semibold text-center tracking-tighter mb-20"
+            tw="text-7xl font-semibold text-center tracking-tighter mb-16"
           >
             {text}
           </h1>
 
           {/* Textarea visualization - increased sizes further */}
           <div tw="flex w-full max-w-4xl mx-auto">
-            <div tw="flex flex-col w-full rounded-3xl border-2 border-white/5 bg-white/5">
+            <div
+              style={{
+                boxShadow: "0 0 7px rgba(255, 140, 0, 1)",
+              }}
+              tw="flex flex-col w-full rounded-3xl border border-white/5 bg-white/5"
+            >
               <div tw="flex flex-col">
                 <div tw="flex w-full min-h-[96px]">
                   <div
@@ -70,7 +75,7 @@ export async function GET() {
                 <div tw="flex w-full items-center justify-between px-6 pb-6">
                   <div />
                   {/* Increased button size further */}
-                  <div tw="flex items-center justify-center w-20 h-20 rounded-2xl bg-[#ff8c00]">
+                  <div tw="flex items-center justify-center w-16 h-16 rounded-xl bg-[#ff8c00]">
                     <svg
                       width="32"
                       height="32"
