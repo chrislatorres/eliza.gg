@@ -23,8 +23,10 @@ export function CodeBlock({ className, children }) {
 
   useEffect(() => {
     if (children.includes("\n")) {
+      const trimmedContent = children.trimEnd();
+
       const state = EditorState.create({
-        doc: children,
+        doc: trimmedContent,
         extensions: [
           basicSetup,
           javascript(),
@@ -63,30 +65,32 @@ export function CodeBlock({ className, children }) {
   };
 
   return children.includes("\n") ? (
-    <div className="read-only-editor w-full bg-white dark:bg-zinc-950 rounded-md overflow-hidden max-w-full min-w-full">
-      <div className="bg-zinc-100 dark:bg-zinc-900 flex items-center px-4 text-xs font-sans py-2 text-zinc-600">
-        <span className="">{language}</span>
-        <div className="ml-auto flex items-center">
-          <button
-            className="flex space-x-2 cursor-pointer"
-            onClick={copyToClipboard}
-          >
-            {copySuccess ? (
-              <>
-                <CheckIcon className="w-4 h-4" />
-                <span>{copySuccess}</span>
-              </>
-            ) : (
-              <>
-                <ClipboardIcon className="w-4 h-4" />
-                <span>Copy code</span>
-              </>
-            )}
-          </button>
+    <div className="not-prose">
+      <div className="read-only-editor w-full bg-white dark:bg-zinc-950 rounded-md overflow-hidden max-w-full min-w-full">
+        <div className="bg-zinc-100 dark:bg-zinc-900 flex items-center px-4 text-xs font-sans py-2 text-zinc-600">
+          <span>{language}</span>
+          <div className="ml-auto flex items-center">
+            <button
+              className="flex gap-1 cursor-pointer items-center"
+              onClick={copyToClipboard}
+            >
+              {copySuccess ? (
+                <>
+                  <CheckIcon className="w-4 h-4" />
+                  <span>{copySuccess}</span>
+                </>
+              ) : (
+                <>
+                  <ClipboardIcon className="w-4 h-4" />
+                  <span>Copy code</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
-      </div>
-      <div className="py-4 code-block">
-        <div ref={ref} />
+        <div className="py-4 code-block">
+          <div ref={ref} />
+        </div>
       </div>
     </div>
   ) : (

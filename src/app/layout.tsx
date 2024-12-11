@@ -63,7 +63,14 @@ export default function RootLayout({
         <div className="flex min-h-dvh w-full flex-col grow">
           <div className="flex grow flex-col size-full min-h-dvh">
             <Header />
-            <ThemeProvider>{children}</ThemeProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
           </div>
         </div>
         <ProgressBar />

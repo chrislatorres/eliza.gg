@@ -1,6 +1,6 @@
 import { createTurso } from "@/libs/indexer/utils/create-turso";
 import { embed } from "@/libs/indexer/utils/embed";
-import { getCerebrasModel } from "@/libs/indexer/utils/models";
+import { getOpenRouterModel } from "@/libs/indexer/utils/models";
 import { createDataStreamResponse, streamText } from "ai";
 
 export async function POST(request: Request) {
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
       });
 
       const result = streamText({
-        model: getCerebrasModel("llama-3.3-70b"),
+        model: getOpenRouterModel("openai/gpt-4o-2024-11-20"),
         system:
           `You are a helpful assistant called Eliza.gg for the Eliza open source framework and the ElizaOS operating system.
 
@@ -68,7 +68,7 @@ Relevant docs:
 ${results}
 \`\`\`
 
-When referencing information, cite the source using [1], [2], etc. corresponding to the order of citations provided.
+When referencing information, cite the source using [1], [2], etc. corresponding to the order of citations provided. Do not list the references, you are only citing.
 `.trim(),
         messages,
       });
