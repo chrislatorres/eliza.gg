@@ -60,7 +60,7 @@ export async function POST(request: Request) {
       });
 
       const result = streamText({
-        model: getOpenRouterModel("openai/gpt-4o-2024-11-20"),
+        model: getOpenRouterModel("anthropic/claude-3.5-sonnet:beta"),
         system:
           `You are a helpful assistant called Eliza.gg for the Eliza open source framework and the ElizaOS operating system.
 

@@ -27,18 +27,18 @@ export function ChatMessage({ message, i, citations }: ChatMessageProps) {
         options={{
           forceBlock: true,
           overrides: {
-            p: (props) => (
-              <div
-                className={clsx(["flex items-center", props.className])}
-                {...props}
-              />
-            ),
-            pre: (props) => (
-              <pre
-                className={clsx(["!px-0 !py-0 !mb-0 !mt-4", props.className])}
-                {...props}
-              />
-            ),
+            // p: (props) => (
+            //   <div
+            //     className={clsx(["flex items-center", props.className])}
+            //     {...props}
+            //   />
+            // ),
+            // pre: (props) => (
+            //   <pre
+            //     className={clsx(["!px-0 !py-0 !mb-0 !mt-4", props.className])}
+            //     {...props}
+            //   />
+            // ),
             code: {
               component: CodeBlock,
             },

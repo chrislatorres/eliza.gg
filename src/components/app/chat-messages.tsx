@@ -14,11 +14,6 @@ export function ChatMessages({ messages, citations }: ChatMessagesProps) {
   const lastMessageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Always scroll to bottom when messages change
-    console.log(
-      "document.documentElement.scrollHeight * 2",
-      document.documentElement.scrollHeight * 2
-    );
     window.scrollTo({
       top: document.documentElement.scrollHeight * 2,
       behavior: "instant",
@@ -35,11 +30,6 @@ export function ChatMessages({ messages, citations }: ChatMessagesProps) {
         top: document.documentElement.scrollHeight * 2,
         behavior: "instant",
       });
-
-      console.log(
-        "document.documentElement.scrollHeight * 2",
-        document.documentElement.scrollHeight * 2
-      );
     }
   }, [messages[messages.length - 1]?.content]);
 

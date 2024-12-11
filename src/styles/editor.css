@@ -67,12 +67,16 @@
   @apply !bg-transparent;
 }
 
+.ͼo.cm-focused .cm-selectionBackground,
+.ͼo .cm-line::selection,
+.ͼo .cm-selectionLayer .cm-selectionBackground,
+.ͼo .cm-content ::selection,
 .ͼ14.cm-focused .cm-selectionBackground,
 .ͼ14 .cm-line::selection,
 .ͼ14 .cm-selectionLayer .cm-selectionBackground,
 .ͼ14 .cm-content ::selection,
 .ͼ14 .cm-selectionMatch,
 .ͼ1 .cm-selectionMatch {
-  @apply !bg-[#ff8c00]/25;
-  background: rgba(255, 140, 0, 0.25) !important;
+  @apply !bg-[#ff8c00];
+  background: #ff8c00 !important;
 }
