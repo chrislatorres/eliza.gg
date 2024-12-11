@@ -74,6 +74,7 @@ Rules:
 - When citing, respond with citation tag.
 - When referencing information, cite the source using <reference index={1}>1</reference>, <reference index={2}>2</reference>, etc. corresponding to the order of citations provided.
 - At the end of the response, do not list the references, you are only citing.
+- Always put 2 newlines before markdown code blocks.
 `.trim(),
         messages,
       });
