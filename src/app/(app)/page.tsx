@@ -1,5 +1,6 @@
 import { LandingTextarea } from "@/components/app/landing-textarea";
 import Link from "next/link";
+import { Suspense } from "react";
 
 export const experimental_ppr = true;
 
@@ -11,7 +12,9 @@ export default function Page() {
           Ask anything about Eliza
         </h1>
         <div className="max-w-xl mx-auto w-full">
-          <LandingTextarea />
+          <Suspense fallback={null}>
+            <LandingTextarea />
+          </Suspense>
         </div>
       </div>
       <p className="mt-auto text-center text-xs text-zinc-400 dark:text-zinc-600 mb-2">

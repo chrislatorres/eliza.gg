@@ -55,24 +55,19 @@ export async function GET() {
 
           {/* Textarea visualization - increased sizes further */}
           <div tw="flex w-full max-w-4xl mx-auto">
-            <div
-              style={{
-                boxShadow: "0 0 7px rgba(255, 140, 0, 1)",
-              }}
-              tw="flex flex-col w-full rounded-3xl border border-white/5 bg-white/5"
-            >
+            <div tw="flex flex-col w-full rounded-3xl border-4 border-white/5 bg-white/5">
               <div tw="flex flex-col">
                 <div tw="flex w-full min-h-[96px]">
                   <div
                     style={{
                       fontFamily: "Inter",
                     }}
-                    tw="w-full bg-transparent px-10 py-8 text-3xl text-zinc-500"
+                    tw="w-full bg-transparent px-6 py-6 text-3xl text-zinc-500"
                   >
                     What is Eliza?
                   </div>
                 </div>
-                <div tw="flex w-full items-center justify-between px-6 pb-6">
+                <div tw="flex w-full items-center justify-between px-4 pb-4">
                   <div />
                   {/* Increased button size further */}
                   <div tw="flex items-center justify-center w-16 h-16 rounded-xl bg-[#ff8c00]">

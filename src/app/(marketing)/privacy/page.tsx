@@ -1,6 +1,8 @@
 import Markdown from "markdown-to-jsx";
 import { Metadata } from "next";
 
+export const experimental_ppr = true;
+
 export const metadata: Metadata = {
   title: "Eliza.gg - Privacy Policy",
 };

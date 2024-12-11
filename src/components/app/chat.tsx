@@ -1,8 +1,7 @@
 "use client";
 
+import { ChatMessages } from "@/components/app/chat-messages";
 import { useChat } from "ai/react";
-import clsx from "clsx";
-import Markdown from "markdown-to-jsx";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "sonner";
@@ -21,7 +20,6 @@ export const Chat = () => {
     api: "/api/search",
     onError: (error) => {
       console.error("Chat error:", error);
-      // You could add toast notification here
     },
   });
 
@@ -52,39 +50,17 @@ export const Chat = () => {
   };
 
   return (
-    <main className="flex flex-col min-h-dvh size-full relative pt-14 max-w-xl mx-auto w-full px-4 md:px-0">
-      <div className="flex-1">
-        <div className="flex flex-col w-full pb-8">
-          {messages.length > 0 && (
-            <div className="flex flex-col gap-4">
-              {messages.map((message, i) => (
-                <div
-                  key={message.id}
-                  className={clsx([
-                    "w-full whitespace-pre-wrap",
-                    "prose prose-slate dark:prose-invert prose-headings:my-0 prose-p:mt-0 !max-w-full",
-                    message.role === "user" ? "text-3xl font-semibold" : "",
-                    message.role === "user" && i !== 0
-                      ? "border-t pt-4 border-zinc-950/5 dark:border-white/5"
-                      : "",
-                  ])}
-                >
-                  <Markdown>{message.content as string}</Markdown>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+    <main className="flex flex-col size-full relative max-w-xl mx-auto w-full px-4 md:px-0">
+      <div className="flex-1 pt-16 pb-32">
+        <ChatMessages messages={messages} />
       </div>
-      <div className="sticky w-full bottom-0 py-4">
-        <div className="">
-          <TextareaWithActions
-            input={input}
-            onInputChange={handleInputChange}
-            onSubmit={onSubmit}
-            isLoading={isLoading}
-          />
-        </div>
+      <div className="fixed w-full max-w-xl mx-auto left-0 right-0 bottom-0 py-4 ">
+        <TextareaWithActions
+          input={input}
+          onInputChange={handleInputChange}
+          onSubmit={onSubmit}
+          isLoading={isLoading}
+        />
       </div>
     </main>
   );

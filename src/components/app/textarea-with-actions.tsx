@@ -86,7 +86,7 @@ export const TextareaWithActions = ({
                 className="size-8"
               >
                 {isLoading ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <Loader2 className="!h-3 !w-3 !shrink-0 animate-spin" />
                 ) : (
                   <ArrowRightIcon className="!h-3 !w-3 !shrink-0" />
                 )}
