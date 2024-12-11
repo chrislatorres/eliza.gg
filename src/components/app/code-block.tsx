@@ -10,10 +10,10 @@ import { useTheme } from "next-themes";
 import { useCallback, useEffect, useState } from "react";
 
 export function CodeBlock({ className, children }) {
-  const language = className?.replace("lang-", "");
   const [copySuccess, setCopySuccess] = useState("");
   const { resolvedTheme } = useTheme();
   const [element, setElement] = useState<HTMLElement>();
+  const [language, setLanguage] = useState("");
 
   const ref = useCallback((node: HTMLElement | null) => {
     if (!node) return;
@@ -23,7 +23,15 @@ export function CodeBlock({ className, children }) {
 
   useEffect(() => {
     if (children.includes("\n")) {
-      const trimmedContent = children.trimEnd();
+      let trimmedContent = children.trimEnd();
+      if (children.startsWith("javascript\n")) {
+        trimmedContent = trimmedContent.replace("javascript\n", "").trim();
+        setLanguage("javascript");
+      } else {
+        console.log("does not start with javascript");
+        const language = className?.replace("lang-", "");
+        setLanguage(language);
+      }
 
       const state = EditorState.create({
         doc: trimmedContent,
@@ -77,12 +85,10 @@ export function CodeBlock({ className, children }) {
               {copySuccess ? (
                 <>
                   <CheckIcon className="w-4 h-4" />
-                  <span>{copySuccess}</span>
                 </>
               ) : (
                 <>
                   <ClipboardIcon className="w-4 h-4" />
-                  <span>Copy code</span>
                 </>
               )}
             </button>

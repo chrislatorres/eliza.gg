@@ -41,7 +41,7 @@ export async function POST(request: Request) {
 
   const results = rows.map((row) => row[3]).join("\n");
 
-  console.log({ results });
+  console.log(results);
 
   const searchResults = rows.map((row) => ({
     url: row[2] as string,
@@ -68,7 +68,11 @@ Relevant docs:
 ${results}
 \`\`\`
 
-When referencing information, cite the source using [1], [2], etc. corresponding to the order of citations provided. Do not list the references, you are only citing.
+Rules:
+- Always cite your sources.
+- When citing, respond with citation tag.
+- When referencing information, cite the source using <reference index={1}>1</reference>, <reference index={2}>2</reference>, etc. corresponding to the order of citations provided.
+- At the end of the response, do not list the references, you are only citing.
 `.trim(),
         messages,
       });

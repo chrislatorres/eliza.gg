@@ -11,6 +11,7 @@ interface ChatMessageProps {
 }
 
 export function ChatMessage({ message, i, citations }: ChatMessageProps) {
+  console.log({ message, citations });
   return (
     <div
       key={message.id}
@@ -28,6 +29,20 @@ export function ChatMessage({ message, i, citations }: ChatMessageProps) {
           overrides: {
             code: {
               component: CodeBlock,
+            },
+            reference: {
+              component: ({ children, index }) => (
+                <a
+                  href={citations[index].url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={clsx([
+                    "rounded-[0.375rem] border bg-gray-100 dark:bg-zinc-900 px-[0.25rem] py-[0.15rem] font-mono text-xs font-normal before:hidden after:hidden border-zinc-950/5 dark:border-white/5 ml-1",
+                  ])}
+                >
+                  {children}
+                </a>
+              ),
             },
           },
         }}
