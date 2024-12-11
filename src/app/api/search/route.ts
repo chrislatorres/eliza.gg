@@ -4,7 +4,7 @@ import { getOpenRouterModel } from "@/libs/indexer/utils/models";
 import { createDataStreamResponse, streamText } from "ai";
 
 export async function POST(request: Request) {
-  if (process.env.NODE_ENV !== "development") {
+  if (process.env.NEXT_PUBLIC_NODE_ENV !== "development") {
     return Response.json({ error: "Not allowed" }, { status: 403 });
   }
 
