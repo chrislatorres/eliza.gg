@@ -4,6 +4,7 @@ import { ProgressBar } from "@/app/progress-bar";
 import { Toaster } from "@/app/toaster";
 import { Header } from "@/components/layout/header";
 import type { Metadata, Viewport } from "next";
+import { ThemeProvider } from "next-themes";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -62,7 +63,7 @@ export default function RootLayout({
         <div className="flex min-h-dvh w-full flex-col grow">
           <div className="flex grow flex-col size-full min-h-dvh">
             <Header />
-            {children}
+            <ThemeProvider>{children}</ThemeProvider>
           </div>
         </div>
         <ProgressBar />

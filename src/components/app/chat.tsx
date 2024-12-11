@@ -1,6 +1,7 @@
 "use client";
 
 import { ChatMessages } from "@/components/app/chat-messages";
+import { ChatResponse } from "@/types/chat";
 import { useChat } from "ai/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
@@ -16,12 +17,16 @@ export const Chat = () => {
     handleSubmit,
     isLoading,
     setInput,
+    data,
   } = useChat({
     api: "/api/search",
     onError: (error) => {
       console.error("Chat error:", error);
     },
   });
+
+  // Extract citations from stream data using safe type assertion
+  const citations = (data?.[0] as unknown as ChatResponse)?.citations || [];
 
   // Handle initial query from URL
   useEffect(() => {
@@ -52,7 +57,7 @@ export const Chat = () => {
   return (
     <main className="flex flex-col size-full relative max-w-xl mx-auto w-full px-4 md:px-0">
       <div className="flex-1 pt-16 pb-32">
-        <ChatMessages messages={messages} />
+        <ChatMessages messages={messages} citations={citations} />
       </div>
       <div className="fixed w-full max-w-xl mx-auto left-0 right-0 bottom-0 py-4 ">
         <TextareaWithActions

@@ -12,3 +12,11 @@
   :is(:where(p):not(:where([class~="not-prose"], [class~="not-prose"] *))) {
   @apply !mt-0 !mb-0;
 }
+
+.prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  @apply !px-0 !py-0;
+}
+
+.prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  @apply !mb-0;
+}

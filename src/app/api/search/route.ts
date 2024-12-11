@@ -1,7 +1,7 @@
 import { createTurso } from "@/libs/indexer/utils/create-turso";
 import { embed } from "@/libs/indexer/utils/embed";
 import { getCerebrasModel } from "@/libs/indexer/utils/models";
-import { streamText } from "ai";
+import { createDataStreamResponse, streamText } from "ai";
 
 export async function POST(request: Request) {
   if (process.env.NODE_ENV !== "development") {
@@ -43,19 +43,37 @@ export async function POST(request: Request) {
 
   console.log({ results });
 
-  const result = streamText({
-    model: getCerebrasModel("llama3.1-70b"),
-    system:
-      `You are a helpful assistant called Eliza.gg for the Eliza open source framework and the ElizaOS operating system.
+  const searchResults = rows.map((row) => ({
+    url: row[2] as string,
+    content: row[3] as string,
+  }));
+
+  return createDataStreamResponse({
+    execute: async (dataStream) => {
+      // Write initial citations
+      dataStream.writeData({
+        citations: searchResults.map((result) => ({
+          url: result.url,
+          content: result.content.slice(0, 200) + "...", // Preview of content
+        })),
+      });
+
+      const result = streamText({
+        model: getCerebrasModel("llama-3.3-70b"),
+        system:
+          `You are a helpful assistant called Eliza.gg for the Eliza open source framework and the ElizaOS operating system.
 
 Relevant docs:
 \`\`\`
 ${results}
 \`\`\`
 
+When referencing information, cite the source using [1], [2], etc. corresponding to the order of citations provided.
 `.trim(),
-    messages,
-  });
+        messages,
+      });
 
-  return result.toDataStreamResponse();
+      result.mergeIntoDataStream(dataStream);
+    },
+  });
 }
