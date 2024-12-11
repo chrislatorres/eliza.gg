@@ -42,6 +42,7 @@ export const TextareaWithActions = () => {
         >
           <form
             onSubmit={(e) => {
+              e.preventDefault();
               if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
                 handleSubmit(e);
               } else {
