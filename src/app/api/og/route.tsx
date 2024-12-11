@@ -1,6 +1,4 @@
 import { ImageResponse } from "next/og";
-// App router includes @vercel/og.
-// No need to install it.
 
 async function loadGoogleFont(font: string, text: string) {
   const url = `https://fonts.googleapis.com/css2?family=${font}&text=${encodeURIComponent(
@@ -26,11 +24,6 @@ export async function GET() {
   const fontNormal = await loadGoogleFont("Inter", text);
   const fontBold = await loadGoogleFont("Inter:wght@600", text);
 
-  // Load the logo image
-  const logoImage = await fetch(
-    new URL("../../../images/eliza-white.png", import.meta.url)
-  ).then((res) => res.arrayBuffer());
-
   return new ImageResponse(
     (
       <div
@@ -42,9 +35,7 @@ export async function GET() {
         <div tw="flex flex-col items-center justify-center w-full p-20">
           {/* Logo - reduced size and margin */}
           <img
-            src={`data:image/png;base64,${Buffer.from(logoImage).toString(
-              "base64"
-            )}`}
+            src={`${process.env.NEXT_PUBLIC_APP_URL}/eliza-white.png`}
             width="64"
             height="64"
             tw="mb-8"

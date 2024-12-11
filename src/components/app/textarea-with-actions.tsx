@@ -48,7 +48,7 @@ export const TextareaWithActions = () => {
                 aria-label="Prompt"
                 value={input}
                 onChange={handleInputChange}
-                placeholder="Ask anything..."
+                placeholder="Ask a question about Eliza..."
                 className={clsx([
                   "size-full bg-transparent",
                   "relative block size-full appearance-none",
