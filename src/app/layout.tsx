@@ -1,9 +1,9 @@
 import { inter } from "@/app/fonts";
 import "@/app/globals.css";
 import { ProgressBar } from "@/app/progress-bar";
+import { Toaster } from "@/app/toaster";
 import { Header } from "@/components/layout/header";
 import type { Metadata, Viewport } from "next";
-import { Toaster } from "sonner";
 
 export const viewport: Viewport = {
   width: "device-width",

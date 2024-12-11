@@ -41,7 +41,14 @@ export const TextareaWithActions = () => {
           ])}
         >
           <form
-            onSubmit={handleSubmit}
+            onSubmit={(e) => {
+              if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
+                handleSubmit(e);
+              } else {
+                toast.info("Coming soon!");
+                return;
+              }
+            }}
             className="flex flex-col items-center justify-center gap-4"
           >
             <div className="relative min-h-[36px] w-full">
