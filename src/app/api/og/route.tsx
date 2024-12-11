@@ -22,9 +22,14 @@ async function loadGoogleFont(font: string, text: string) {
 }
 
 export async function GET() {
-  const text = "Ask anything about Eliza"; // Text that will be displayed
+  const text = "Ask anything about Eliza";
   const fontNormal = await loadGoogleFont("Inter", text);
   const fontBold = await loadGoogleFont("Inter:wght@600", text);
+
+  // Load the logo image
+  const logoImage = await fetch(
+    new URL("../../../images/eliza-white.png", import.meta.url)
+  ).then((res) => res.arrayBuffer());
 
   return new ImageResponse(
     (
@@ -34,38 +39,50 @@ export async function GET() {
         }}
         tw="flex flex-col items-center justify-center w-full h-full bg-black text-white"
       >
-        <div tw="flex flex-col items-center justify-center w-full p-8">
+        <div tw="flex flex-col items-center justify-center w-full p-20">
+          {/* Logo - reduced size and margin */}
+          <img
+            src={`data:image/png;base64,${Buffer.from(logoImage).toString(
+              "base64"
+            )}`}
+            width="64"
+            height="64"
+            tw="mb-8"
+            alt="Eliza Logo"
+          />
+
           {/* Title */}
           <h1
             style={{
               fontFamily: "Inter",
               fontWeight: "900",
             }}
-            tw="text-4xl font-semibold text-center tracking-tighter mb-8"
+            tw="text-7xl font-semibold text-center tracking-tighter mb-20"
           >
             {text}
           </h1>
 
-          {/* Textarea visualization */}
-          <div tw="flex w-full max-w-xl mx-auto">
-            <div tw="flex flex-col w-full rounded-lg border border-white/5 bg-white/5">
+          {/* Textarea visualization - increased sizes further */}
+          <div tw="flex w-full max-w-4xl mx-auto">
+            <div tw="flex flex-col w-full rounded-3xl border-2 border-white/5 bg-white/5">
               <div tw="flex flex-col">
-                <div tw="flex w-full min-h-[36px]">
+                <div tw="flex w-full min-h-[96px]">
                   <div
                     style={{
                       fontFamily: "Inter",
                     }}
-                    tw="w-full bg-transparent px-4 py-3 text-base text-zinc-500"
+                    tw="w-full bg-transparent px-10 py-8 text-3xl text-zinc-500"
                   >
-                    Ask anything...
+                    What is Eliza?
                   </div>
                 </div>
-                <div tw="flex w-full items-center justify-between px-2 pb-2.5">
+                <div tw="flex w-full items-center justify-between px-6 pb-6">
                   <div />
-                  <div tw="flex items-center justify-center w-8 h-8 rounded-md bg-[#ff8c00]">
+                  {/* Increased button size further */}
+                  <div tw="flex items-center justify-center w-20 h-20 rounded-2xl bg-[#ff8c00]">
                     <svg
-                      width="12"
-                      height="12"
+                      width="32"
+                      height="32"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="white"
