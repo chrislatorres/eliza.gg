@@ -3,6 +3,7 @@ import { Message } from "ai";
 export interface Citation {
   url: string;
   content: string;
+  title: string;
 }
 
 export interface ChatStreamData {

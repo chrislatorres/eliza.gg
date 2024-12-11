@@ -4,7 +4,7 @@ import { ChatMessages } from "@/components/app/chat-messages";
 import { ChatResponse } from "@/types/chat";
 import { useChat } from "ai/react";
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { TextareaWithActions } from "./textarea-with-actions";
 
@@ -25,15 +25,31 @@ export const Chat = () => {
     },
   });
 
-  // Extract citations from stream data using safe type assertion
-  const citations = (data?.[0] as unknown as ChatResponse)?.citations || [];
+  // Memoize citations
+  const citations = useMemo(() => {
+    return (data?.[0] as unknown as ChatResponse)?.citations || [];
+  }, [data]);
+
+  // Memoize handlers
+  const onInputChange = useCallback(handleInputChange, [handleInputChange]);
+
+  const onSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
+        handleSubmit(e);
+      } else {
+        toast.info("Coming soon!");
+      }
+    },
+    [handleSubmit]
+  );
 
   // Handle initial query from URL
   useEffect(() => {
     const query = searchParams.get("q");
     if (query && messages.length === 0) {
       setInput(query);
-      // Use setTimeout to ensure the form submission happens after render
       setTimeout(() => {
         if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
           handleSubmit(new Event("submit") as any);
@@ -44,28 +60,24 @@ export const Chat = () => {
     }
   }, [searchParams, messages.length, setInput, handleSubmit]);
 
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
-      handleSubmit(e);
-    } else {
-      toast.info("Coming soon!");
-      return;
-    }
-  };
+  // Memoize textarea props
+  const textareaProps = useMemo(
+    () => ({
+      input,
+      onInputChange,
+      onSubmit,
+      isLoading,
+    }),
+    [input, onInputChange, onSubmit, isLoading]
+  );
 
   return (
-    <main className="flex flex-col size-full relative max-w-xl mx-auto w-full px-4 md:px-0">
-      <div className="flex-1 pt-16 pb-32">
+    <main className="flex flex-col size-full relative max-w-xl mx-auto w-full">
+      <div className="flex-1 pt-16 pb-32  px-4 md:px-0">
         <ChatMessages messages={messages} citations={citations} />
       </div>
-      <div className="fixed w-full max-w-xl mx-auto left-0 right-0 bottom-0 py-4 ">
-        <TextareaWithActions
-          input={input}
-          onInputChange={handleInputChange}
-          onSubmit={onSubmit}
-          isLoading={isLoading}
-        />
+      <div className="fixed w-full max-w-xl mx-auto left-0 right-0 bottom-0 py-4  px-4 md:px-0">
+        <TextareaWithActions {...textareaProps} />
       </div>
     </main>
   );

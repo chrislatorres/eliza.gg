@@ -1,10 +1,9 @@
 "use client";
 
 import { ChatMessage } from "@/components/app/chat-message";
-import { ChatScrollAnchor } from "@/components/app/chat-scroll-anchor";
 import { Citation } from "@/types/chat";
 import { Message } from "ai";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -12,31 +11,52 @@ interface ChatMessagesProps {
 }
 
 export function ChatMessages({ messages, citations }: ChatMessagesProps) {
-  useEffect(() => {
-    // Check if we're near the bottom before auto-scrolling
-    const isNearBottom =
-      window.innerHeight + window.scrollY >=
-      document.documentElement.scrollHeight - 100;
+  const lastMessageRef = useRef<HTMLDivElement>(null);
 
-    if (isNearBottom) {
+  useEffect(() => {
+    // Always scroll to bottom when messages change
+    console.log(
+      "document.documentElement.scrollHeight * 2",
+      document.documentElement.scrollHeight * 2
+    );
+    window.scrollTo({
+      top: document.documentElement.scrollHeight * 2,
+      behavior: "instant",
+    });
+  }, [messages]);
+
+  // Also scroll when the last message content changes (streaming)
+  useEffect(() => {
+    if (!messages.length) return;
+
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage.role === "assistant") {
       window.scrollTo({
-        top: document.documentElement.scrollHeight,
+        top: document.documentElement.scrollHeight * 2,
         behavior: "instant",
       });
+
+      console.log(
+        "document.documentElement.scrollHeight * 2",
+        document.documentElement.scrollHeight * 2
+      );
     }
-  }, [messages]);
+  }, [messages[messages.length - 1]?.content]);
 
   return (
     <div className="flex flex-col gap-4 whitespace-normal break-words">
       {messages.map((message, i) => (
-        <ChatMessage
+        <div
           key={message.id}
-          message={message}
-          i={i}
-          citations={message.role === "assistant" ? citations : undefined}
-        />
+          ref={i === messages.length - 1 ? lastMessageRef : undefined}
+        >
+          <ChatMessage
+            message={message}
+            i={i}
+            citations={message.role === "assistant" ? citations : undefined}
+          />
+        </div>
       ))}
-      <ChatScrollAnchor />
     </div>
   );
 }

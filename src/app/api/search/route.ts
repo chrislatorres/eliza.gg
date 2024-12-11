@@ -55,6 +55,7 @@ export async function POST(request: Request) {
         citations: searchResults.map((result) => ({
           url: result.url,
           content: result.content.slice(0, 200) + "...", // Preview of content
+          title: result.content.split("Title: ")[1].split("\n")[0],
         })),
       });
 

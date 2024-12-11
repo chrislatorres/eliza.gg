@@ -11,7 +11,6 @@ interface ChatMessageProps {
 }
 
 export function ChatMessage({ message, i, citations }: ChatMessageProps) {
-  console.log({ message, citations });
   return (
     <div
       key={message.id}
@@ -26,21 +25,40 @@ export function ChatMessage({ message, i, citations }: ChatMessageProps) {
     >
       <Markdown
         options={{
+          forceBlock: true,
           overrides: {
+            p: (props) => (
+              <div
+                className={clsx(["flex items-center", props.className])}
+                {...props}
+              />
+            ),
+            pre: (props) => (
+              <pre
+                className={clsx(["!px-0 !py-0 !mb-0 !mt-4", props.className])}
+                {...props}
+              />
+            ),
             code: {
               component: CodeBlock,
             },
             reference: {
               component: ({ children, index }) => (
                 <a
-                  href={citations[index].url}
+                  href={citations?.[index]?.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={clsx([
-                    "rounded-[0.375rem] border bg-gray-100 dark:bg-zinc-900 px-[0.25rem] py-[0.15rem] font-mono text-xs font-normal before:hidden after:hidden border-zinc-950/5 dark:border-white/5 ml-1",
+                    "inline-flex items-center justify-center",
+                    "align-super text-[0.6em] font-normal",
+                    "no-underline rounded-sm",
+                    "text-blue-600 dark:text-blue-400",
+                    "hover:text-blue-800 dark:hover:text-blue-200",
+                    "py-0.5",
+                    "leading-none",
                   ])}
                 >
-                  {children}
+                  [{children}]
                 </a>
               ),
             },
@@ -50,27 +68,26 @@ export function ChatMessage({ message, i, citations }: ChatMessageProps) {
         {message.content as string}
       </Markdown>
 
-      {citations && citations.length > 0 && (
+      {/* {citations && citations.length > 0 && (
         <div className="text-sm pt-4">
           <div className="font-medium mb-2">Sources:</div>
           <div className="space-y-2">
             {citations.map((citation, index) => (
               <div key={index} className="text-zinc-600 dark:text-zinc-400">
-                [{index + 1}]{" "}
+                {index + 1}.{" "}
                 <a
                   href={citation.url}
                   className="underline hover:text-zinc-900 dark:hover:text-zinc-100"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {citation.url}
+                  {citation.title}
                 </a>
-                <div className="text-xs mt-1">{citation.content}</div>
               </div>
             ))}
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

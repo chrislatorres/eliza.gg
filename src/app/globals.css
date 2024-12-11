@@ -31,3 +31,11 @@
 .prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
   @apply !mb-0;
 }
+
+.prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  @apply !bg-transparent;
+}
+
+.prose :where(ol):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  @apply !mt-0;
+}
