@@ -5,6 +5,7 @@ import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { useChat } from "ai/react";
 import clsx from "clsx";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export const TextareaWithActions = () => {
   const { messages, input, handleInputChange, handleSubmit, isLoading } =
@@ -65,7 +66,12 @@ export const TextareaWithActions = () => {
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
-                    handleSubmit(e);
+                    if (process.env.NODE_ENV !== "development") {
+                      toast.info("Coming soon!");
+                      return;
+                    } else {
+                      handleSubmit(e);
+                    }
                   }
                 }}
               />

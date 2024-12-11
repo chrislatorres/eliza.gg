@@ -4,6 +4,10 @@ import { getCerebrasModel } from "@/libs/indexer/utils/models";
 import { streamText } from "ai";
 
 export async function POST(request: Request) {
+  if (process.env.NODE_ENV !== "development") {
+    return Response.json({ error: "Not allowed" }, { status: 403 });
+  }
+
   const { messages } = await request.json();
   const lastMessage = messages[messages.length - 1];
   const query = lastMessage.content;

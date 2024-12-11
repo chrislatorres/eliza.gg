@@ -3,6 +3,7 @@ import "@/app/globals.css";
 import { ProgressBar } from "@/app/progress-bar";
 import { Header } from "@/components/layout/header";
 import type { Metadata, Viewport } from "next";
+import { Toaster } from "sonner";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -65,6 +66,7 @@ export default function RootLayout({
           </div>
         </div>
         <ProgressBar />
+        <Toaster />
       </body>
     </html>
   );
