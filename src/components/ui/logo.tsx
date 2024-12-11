@@ -1,5 +1,6 @@
 import elizaBlack from "@/images/eliza-black.png";
 import elizaWhite from "@/images/eliza-white.png";
+import clsx from "clsx";
 import Image from "next/image";
 
 interface LogoProps {
@@ -10,7 +11,7 @@ interface LogoProps {
 
 export function Logo({ width = 120, height = 32, className = "" }: LogoProps) {
   return (
-    <div className={className}>
+    <div className={clsx(["select-none", className])}>
       <Image
         src={elizaWhite}
         alt="Eliza Logo"

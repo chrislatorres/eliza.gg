@@ -1,4 +1,4 @@
-import { TextareaWithActions } from "@/components/app/textarea-with-actions";
+import { LandingTextarea } from "@/components/app/landing-textarea";
 import Link from "next/link";
 
 export const experimental_ppr = true;
@@ -6,12 +6,12 @@ export const experimental_ppr = true;
 export default function Page() {
   return (
     <main className="flex-1 size-full overflow-hidden flex flex-col justify-center items-center">
-      <div className="flex-1 size-full overflow-hidden flex flex-col justify-center items-center gap-8">
+      <div className="flex-1 size-full overflow-hidden flex flex-col justify-center items-center gap-8 px-4 md:px-0">
         <h1 className="text-3xl xl:text-4xl font-semibold text-center tracking-tighter text-pretty">
           Ask anything about Eliza
         </h1>
         <div className="max-w-xl mx-auto w-full">
-          <TextareaWithActions />
+          <LandingTextarea />
         </div>
       </div>
       <p className="mt-auto text-center text-xs text-zinc-400 dark:text-zinc-600 mb-2">

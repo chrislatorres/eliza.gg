@@ -1,2 +1,14 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+
+.prose
+  :where(p:last-child):not(
+    :where([class~="not-prose"], [class~="not-prose"] *)
+  ) {
+  @apply !mb-0 !mt-0;
+}
+
+.prose-p\:mt-0
+  :is(:where(p):not(:where([class~="not-prose"], [class~="not-prose"] *))) {
+  @apply !mt-0 !mb-0;
+}

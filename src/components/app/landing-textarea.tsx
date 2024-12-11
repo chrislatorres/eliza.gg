@@ -1,25 +1,57 @@
 "use client";
 
+import { ExamplePrompts } from "@/components/app/example-prompts";
 import { Button } from "@/components/ui/button";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
+import { toast } from "sonner";
 
-interface TextareaWithActionsProps {
-  input: string;
-  onInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  isLoading: boolean;
-}
+export const LandingTextarea = () => {
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-export const TextareaWithActions = ({
-  input,
-  onInputChange,
-  onSubmit,
-  isLoading,
-}: TextareaWithActionsProps) => {
+  const { push } = useRouter();
+
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setInput(e.target.value);
+    },
+    []
+  );
+
+  const handleCreateSearch = useCallback((prompt: string) => {
+    push(`/search?q=${prompt}`);
+  }, []);
+
+  const handleSubmit = useCallback(
+    (e: any) => {
+      try {
+        e?.preventDefault();
+
+        setIsLoading(true);
+        handleCreateSearch(input);
+      } catch (error) {
+        console.error(error);
+        setIsLoading(false);
+      }
+    },
+    [input]
+  );
+
+  const handlePromptSelect = useCallback((prompt: string) => {
+    if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
+      handleCreateSearch(prompt);
+    } else {
+      toast.info("Coming soon!");
+      return;
+    }
+  }, []);
+
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full gap-4">
       <span
         data-slot="control"
         className={clsx([
@@ -32,27 +64,32 @@ export const TextareaWithActions = ({
           className={clsx([
             "relative block size-full appearance-none overflow-hidden rounded-lg",
             "text-base/6 text-zinc-950 placeholder:text-zinc-400 sm:text-sm/6 dark:text-white",
-            "bg-zinc-100 dark:bg-zinc-950",
+            "bg-zinc-950/5 dark:bg-white/5",
             "focus:outline-none",
             "data-[invalid]:border-red-500 data-[invalid]:data-[hover]:border-red-500 data-[invalid]:dark:border-red-600 data-[invalid]:data-[hover]:dark:border-red-600",
             "disabled:border-zinc-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:data-[hover]:disabled:border-white/15",
             "ring-offset-background",
-            // "focus-within:ring-2 focus-within:dark:ring-[#ff8c00]/20 focus-within:ring-[#ff8c00]/20",
             "focus-within:ring-2 focus-within:dark:ring-white/15 focus-within:ring-zinc-950/15",
             "border border-zinc-950/5 dark:border-white/5",
-            "relative",
           ])}
         >
           <form
-            onSubmit={onSubmit}
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
+                handleSubmit(e);
+              } else {
+                toast.info("Coming soon!");
+                return;
+              }
+            }}
             className="flex flex-col items-center justify-center"
           >
             <div className="relative min-h-[36px] w-full">
               <textarea
-                autoFocus
                 aria-label="Prompt"
                 value={input}
-                onChange={onInputChange}
+                onChange={handleInputChange}
                 placeholder="Ask a question about Eliza..."
                 className={clsx([
                   "size-full bg-transparent",
@@ -71,7 +108,12 @@ export const TextareaWithActions = ({
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
-                    onSubmit(e);
+                    if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
+                      handleSubmit(e);
+                    } else {
+                      toast.info("Coming soon!");
+                      return;
+                    }
                   }
                 }}
               />
@@ -95,6 +137,8 @@ export const TextareaWithActions = ({
           </form>
         </div>
       </span>
+
+      <ExamplePrompts onPromptSelect={handlePromptSelect} />
     </div>
   );
 };

@@ -4,6 +4,8 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex grow flex-col size-full shrink-0">{children}</div>
+    <div className="flex min-h-dvh flex-col size-full shrink-0 relative">
+      {children}
+    </div>
   );
 }
