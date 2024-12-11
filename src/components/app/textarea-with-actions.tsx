@@ -66,11 +66,11 @@ export const TextareaWithActions = () => {
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
-                    if (process.env.NODE_ENV !== "development") {
+                    if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
+                      handleSubmit(e);
+                    } else {
                       toast.info("Coming soon!");
                       return;
-                    } else {
-                      handleSubmit(e);
                     }
                   }
                 }}
