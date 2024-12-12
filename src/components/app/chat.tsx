@@ -86,7 +86,7 @@ export const Chat = () => {
   console.log({ messages });
   return (
     <main className="flex flex-col size-full relative md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] mx-auto w-full px-4 md:px-0 min-h-dvh">
-      <div className="flex-1 pt-16 pb-32">
+      <div className="flex-1 pt-16 pb-8">
         <ChatMessages messages={messages} citations={citations} />
       </div>
       <div className="sticky w-full md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] mx-auto left-0 right-0 bottom-0 pb-4  bg-white dark:bg-black rounded-t-lg">
