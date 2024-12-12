@@ -103,7 +103,7 @@ export const TextareaWithActions = memo(function TextareaWithActions({
             "data-[invalid]:border-red-500 data-[invalid]:data-[hover]:border-red-500 data-[invalid]:dark:border-red-600 data-[invalid]:data-[hover]:dark:border-red-600",
             "disabled:border-zinc-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:data-[hover]:disabled:border-white/15",
             "ring-offset-background",
-            "focus-within:ring-2 focus-within:ring-zinc-200 focus-within:dark:ring-zinc-800",
+            "focus-within:ring focus-within:ring-zinc-200 focus-within:dark:ring-zinc-800",
             "border border-zinc-200 dark:border-zinc-800",
             "relative",
           ])}
