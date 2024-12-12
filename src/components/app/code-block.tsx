@@ -18,7 +18,6 @@ import { useTheme } from "next-themes";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 export function CodeBlock({ className, children }) {
-  console.log({ className });
   const [copySuccess, setCopySuccess] = useState("");
   const { resolvedTheme } = useTheme();
   const [element, setElement] = useState<HTMLElement>();

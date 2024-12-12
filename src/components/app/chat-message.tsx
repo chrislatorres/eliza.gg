@@ -57,24 +57,36 @@ export function ChatMessage({ message, i, citations }: ChatMessageProps) {
                 component: CodeBlock,
               },
               reference: {
-                component: ({ children, index }) => (
-                  <a
-                    href={citations?.[index]?.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={clsx([
-                      "inline-flex items-center justify-center",
-                      "align-super text-[0.6em] font-normal",
-                      "no-underline rounded-sm",
-                      "text-[#ff8c00]",
-                      "hover:text-[#cc7000]",
-                      "py-0.5",
-                      "leading-none",
-                    ])}
-                  >
-                    [{children}]
-                  </a>
-                ),
+                component: ({ children, index }) => {
+                  // Citation references are already 0-based in the markdown
+                  const citationIndex = Number(index);
+                  const citation = citations?.[citationIndex];
+
+                  console.log("reference", {
+                    citation,
+                    citations,
+                    citationIndex,
+                  });
+
+                  return (
+                    <a
+                      href={citation?.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={clsx([
+                        "inline-flex items-center justify-center",
+                        "align-super text-[0.6em] font-normal",
+                        "no-underline rounded-sm",
+                        "text-[#ff8c00]",
+                        "hover:text-[#cc7000]",
+                        "py-0.5",
+                        "leading-none",
+                      ])}
+                    >
+                      [{children}]
+                    </a>
+                  );
+                },
               },
             },
           }}

@@ -1,7 +1,7 @@
 "use client";
 
 import { ChatMessages } from "@/components/app/chat-messages";
-import { ChatResponse } from "@/types/chat";
+import { ChatResponse, Citation } from "@/types/chat";
 import { useChat } from "ai/react";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
@@ -25,10 +25,16 @@ export const Chat = () => {
     },
   });
 
-  // Memoize citations
   const citations = useMemo(() => {
-    return (data?.[0] as unknown as ChatResponse)?.citations || [];
+    return (
+      (data as unknown as ChatResponse[])?.reduce((acc, d, index) => {
+        acc[index] = d.citations || [];
+        return acc;
+      }, {} as Record<number, Citation[]>) || {}
+    );
   }, [data]);
+
+  console.log({ citations });
 
   // Memoize handlers
   const onInputChange = useCallback(handleInputChange, [handleInputChange]);
@@ -83,11 +89,10 @@ export const Chat = () => {
     preload();
   }, []);
 
-  console.log({ messages });
   return (
     <main className="flex flex-col size-full relative md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] mx-auto w-full px-4 md:px-0 min-h-dvh">
       <div className="flex-1 pt-16 pb-8">
-        <ChatMessages messages={messages} citations={citations} />
+        <ChatMessages messages={messages} citationsMap={citations} />
       </div>
       <div className="sticky w-full md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] mx-auto left-0 right-0 bottom-0 pb-4  bg-white dark:bg-black rounded-t-lg">
         <TextareaWithActions {...textareaProps} />

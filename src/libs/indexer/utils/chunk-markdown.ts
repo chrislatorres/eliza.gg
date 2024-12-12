@@ -6,8 +6,8 @@ interface MarkdownMetadata {
 export function chunkMarkdown(
   markdown: string,
   metadata: MarkdownMetadata,
-  chunkSize = 512,
-  overlapSize = 64
+  chunkSize = 1024,
+  overlapSize = 128
 ) {
   // Remove excessive whitespace and split into lines
   const lines = markdown.trim().split(/\n+/);

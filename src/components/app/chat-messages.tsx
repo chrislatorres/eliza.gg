@@ -7,11 +7,14 @@ import { useEffect, useRef } from "react";
 
 interface ChatMessagesProps {
   messages: Message[];
-  citations?: Citation[];
+  citationsMap: Record<number, Citation[]>;
 }
 
-export function ChatMessages({ messages, citations }: ChatMessagesProps) {
+export function ChatMessages({ messages, citationsMap }: ChatMessagesProps) {
   const lastMessageRef = useRef<HTMLDivElement>(null);
+
+  // Keep track of assistant message count
+  let assistantIndex = -1;
 
   useEffect(() => {
     window.scrollTo({
@@ -35,18 +38,29 @@ export function ChatMessages({ messages, citations }: ChatMessagesProps) {
 
   return (
     <div className="flex flex-col gap-4 whitespace-normal break-words">
-      {messages.map((message, i) => (
-        <div
-          key={message.id}
-          ref={i === messages.length - 1 ? lastMessageRef : undefined}
-        >
-          <ChatMessage
-            message={message}
-            i={i}
-            citations={message.role === "assistant" ? citations : undefined}
-          />
-        </div>
-      ))}
+      {messages.map((message, i) => {
+        // Increment assistant index only for assistant messages
+        if (message.role === "assistant") {
+          assistantIndex++;
+        }
+
+        return (
+          <div
+            key={message.id}
+            ref={i === messages.length - 1 ? lastMessageRef : undefined}
+          >
+            <ChatMessage
+              message={message}
+              i={i}
+              citations={
+                message.role === "assistant"
+                  ? citationsMap[assistantIndex]
+                  : undefined
+              }
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }

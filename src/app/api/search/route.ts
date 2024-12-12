@@ -49,7 +49,7 @@ export async function POST(request: Request) {
       // Write initial citations
       dataStream.writeData({
         citations: searchResults.map((result) => ({
-          url: result.url,
+          url: result.content.split("URL Source: ")[1].split("\n")[0],
           content: result.content.slice(0, 200) + "...", // Preview of content
           title: result.content.split("Title: ")[1].split("\n")[0],
         })),
@@ -57,15 +57,16 @@ export async function POST(request: Request) {
 
       const results = searchResults
         .map((result) => ({
-          url: result.url,
-          content: result.content,
           title: result.content.split("Title: ")[1].split("\n")[0],
+          urlSource: result.content.split("URL Source: ")[1].split("\n")[0],
+          content: result.content
+            .split("URL Source: ")[1]
+            .split("\n")
+            .slice(1)
+            .join("\n"),
         }))
-        .map(
-          (row, i) =>
-            `Reference Index #${i + 1} | Title: ${row.title}: \n\n${
-              row.content
-            } \n\n`
+        .map((row, i) =>
+          `Reference Index #${i}\nReference Title: ${row.title}\nURL Source: ${row.urlSource}\n----------\n${row.content}\n----------\n`.trim()
         )
         .join("\n");
 
@@ -112,6 +113,7 @@ You are a helpful assistant called Eliza.gg and you assist community members wit
     - At the end of the response, do not list the references, you are only citing.
     - Do NOT tell the user to go/explore/refer to the documentation or references.
     - DO NOT say anything like "For more information, you can refer to the documentation." or "For more information on the available commands, you can check the Local Development Guide".
+    - DO NOT use references from the same URL source more than once. If there are duplicates, use the earliest reference index.
 </citations-rules>
 
 <response-rules>
