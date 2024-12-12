@@ -4,7 +4,7 @@ import clsx from "clsx";
 const examplePrompts: string[] = [
   "What is Eliza?",
   "What is ai16z?",
-  "How to build with Eliza",
+  "How to create an agent",
 ];
 
 interface ExamplePromptsProps {
