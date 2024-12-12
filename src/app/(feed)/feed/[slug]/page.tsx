@@ -1,54 +1,42 @@
 import { DiscussionSection } from "@/components/app/discussion-section";
 import { getPostComments } from "@/lib/comments";
-import { getPostBySlug, getPosts } from "@/lib/mdx";
-import { MDXRemote } from "next-mdx-remote/rsc";
+import { createClient } from '@libsql/client';
 import { notFound } from "next/navigation";
 
-export async function generateStaticParams() {
-    const posts = getPosts();
-    return posts.map((post) => ({
-        slug: post.slug,
-    }));
-}
+const client = createClient({
+    url: process.env.TURSO_DATABASE_URL!,
+    authToken: process.env.TURSO_AUTH_TOKEN!,
+});
 
 export default async function PostPage({ params }: { params: { slug: string } }) {
-    const post = getPostBySlug(params.slug);
-    const comments = await getPostComments(params.slug);
+    // Fetch post directly from Turso
+    const result = await client.execute({
+        sql: 'SELECT * FROM posts WHERE slug = ?',
+        args: [params.slug]
+    });
 
+    const post = result.rows?.[0];
     if (!post) {
         notFound();
     }
+
+    const comments = await getPostComments(params.slug);
 
     return (
         <div className="bg-black min-h-screen py-24 sm:py-32">
             <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
                 <article className="max-w-3xl mx-auto">
                     <header className="mb-8">
-                        <time className="text-sm font-semibold text-orange-400" dateTime={post.frontmatter.date}>
-                            {new Date(post.frontmatter.date).toLocaleDateString()}
+                        <time className="text-sm font-semibold text-orange-400" dateTime={post.created_at}>
+                            {new Date(post.created_at).toLocaleDateString()}
                         </time>
                         <h1 className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-5xl">
-                            {post.frontmatter.title}
+                            {post.title}
                         </h1>
-                        {post.frontmatter.excerpt && (
-                            <p className="mt-4 text-xl text-gray-400">
-                                {post.frontmatter.excerpt}
-                            </p>
-                        )}
                     </header>
 
-                    {post.frontmatter.image && (
-                        <div className="mb-12 aspect-video w-full overflow-hidden rounded-lg">
-                            <img
-                                src={post.frontmatter.image}
-                                alt={post.frontmatter.title}
-                                className="w-full object-cover"
-                            />
-                        </div>
-                    )}
-
-                    <div className="prose prose-invert prose-lg max-w-none">
-                        <MDXRemote source={post.content} />
+                    <div className="prose prose-invert prose-lg max-w-none whitespace-pre-wrap">
+                        {post.content}
                     </div>
 
                     <div className="mt-16">

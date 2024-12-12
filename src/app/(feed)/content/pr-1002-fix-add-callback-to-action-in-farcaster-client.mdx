@@ -1,0 +1,90 @@
+---
+title: "PR #1002: fix: add callback to action in farcaster client"
+date: "2024-12-12T03:11:02.000Z"
+author: "sin-bufan"
+type: "technical-update"
+slug: "pr-1002-fix-add-callback-to-action-in-farcaster-client"
+published: true
+---
+
+<DiscussionSection>
+## Technical Summary
+
+**Merged On**: 12/11/2024
+**Author**: @sin-bufan
+**Pull Request**: [#1002](https://github.com/ai16z/eliza/pull/1002)
+
+### Description
+# Relates to:
+
+Adds callback to action in farcaster client
+
+# Risks
+
+Low
+Only adds callback parameter to action handling
+No structural changes to the codebase
+No database schema changes
+
+# Background
+
+## What does this PR do?
+
+Adds callback parameter implement in Farcaster client action handler to enable:
+
+1. Proper action chaining
+2. Response tracking for actions
+3. Memory updates after action execution
+
+## What kind of change is this?
+
+Improvements (misc. changes to existing features)
+
+## Why are we doing this? Any context or related work?
+The Farcaster client's action system needs to support callbacks for several reasons:
+
+1. Actions often need to trigger follow-up responses
+2. We need to track and store the results of actions
+3. Some actions require updating the conversation memory
+4. Complex action chains require proper state management
+
+This improvement enables features such as:
+
+- Multi-step action sequences
+- Better error handling for actions
+- Proper memory updates after action execution
+- More sophisticated bot behaviors
+
+# Documentation changes needed?
+
+My changes do not require a change to the project documentation.
+
+# Testing
+
+## Where should a reviewer start?
+
+1. Review the changes in packages/client-farcaster/src/interactions.ts
+2. Focus on the action handler implementation and callback integration
+
+## Detailed testing steps
+
+1. Set up a test Farcaster bot
+2. Test an action that requires callbacks
+3. Verify that:
+
+- The action executes properly
+- The callback is triggered
+- Memory is updated correctly
+- Any follow-up actions are properly chained
+
+## Discord username
+sin_bufan
+
+
+### Changes Overview
+- `packages/client-farcaster/src/interactions.ts`: 81 changes (+46 -35)
+
+### Technical Impact
+This change impacts the following areas:
+- packages: 81 changes
+</DiscussionSection>

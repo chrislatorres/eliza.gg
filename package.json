@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "bunx --bun next dev --turbo",
-    "build": "next build"
+    "build": "next build",
+    "generate-tech-updates": "bun run src/scripts/update-docs.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.7",
@@ -14,6 +15,7 @@
     "@codemirror/view": "^6.35.3",
     "@heroicons/react": "^2.2.0",
     "@libsql/client": "^0.14.0",
+    "@octokit/rest": "^21.0.2",
     "@openrouter/ai-sdk-provider": "^0.0.6",
     "@tailwindcss/postcss": "^4.0.0-beta.1",
     "@uiw/codemirror-theme-github": "4.21.19",

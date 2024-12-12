@@ -1,0 +1,134 @@
+---
+title: "PR #913: Twitter client enhancements"
+date: "2024-12-12T08:38:38.000Z"
+author: "tharak123455"
+type: "technical-update"
+slug: "pr-913-twitter-client-enhancements"
+published: true
+---
+
+<DiscussionSection>
+## Technical Summary
+
+**Merged On**: 12/12/2024
+**Author**: @tharak123455
+**Pull Request**: [#913](https://github.com/ai16z/eliza/pull/913)
+
+### Description
+<!-- Use this template by filling in information and copy and pasting relevant items out of the html comments. -->
+
+# Relates to:
+Issue related to Twitter client enhancements and environment configuration
+<!-- LINK TO ISSUE OR TICKET -->
+
+<!-- This risks section is to be filled out before final review and merge. -->
+
+# Risks
+Low - Changes to Twitter target users configuration and environment example file. No core functionality changes.
+
+<!--
+Low, medium, large. List what kind of risks, and what could be effected.
+-->
+
+# Background
+
+## What does this PR do?
+Adds dynamic Twitter target users configuration through environment variables(agent can interact with these user tweets even if it is not mentioned)
+Updates .env.example with Twitter-related configuration examples
+Improves error handling for wallet providers in Twitter client
+Enhances Twitter interaction handling
+
+
+## What kind of change is this?
+Improvements (misc. changes to existing features)
+
+
+<!--
+Bug fixes (non-breaking change which fixes an issue)
+Improvements (misc. changes to existing features)
+Features (non-breaking change which adds functionality)
+Updates (new versions of included code)
+-->
+
+<!-- This "Why" section is most relevant if there is no linked issue explaining why. If there is a related issue it might make sense to skip this why section. -->
+<!--
+## Why are we doing this? Any context or related work?
+-->
+
+# Documentation changes needed?
+My changes require a change to the project documentation.
+Updated .env.example with new Twitter configuration options
+Documentation for Twitter target users configuration
+
+<!--
+My changes do not require a change to the project documentation.
+My changes require a change to the project documentation.
+If a docs change is needed: I have updated the documentation accordingly.
+-->
+
+<!-- Please show how you tested the PR. This will really help if the PR needs to be retested, and probably help the PR get merged quicker. -->
+
+# Testing
+
+## Where should a reviewer start?
+Check the updated .env.example file for new Twitter configurations
+Review changes in packages/client-twitter/src/interactions.ts
+
+
+## Detailed testing steps
+Copy .env.example to .env
+Configure TWITTER_TARGET_USERS with comma-separated usernames
+Run the Twitter client
+Bot responds to configured target users
+Error handling works for wallet provider issues
+Twitter interactions are properly processed
+
+
+<!--
+None, automated tests are fine.
+-->
+
+<!--
+- As [anon/admin], go to [link]
+  - [do action]
+  - verify [result]
+-->
+
+<!-- If there is a UI change, please include before and after screenshots or videos. This will speed up PRs being merged. It is extra nice to annotate screenshots with arrows or boxes pointing out the differences. -->
+<!--
+## Screenshots
+### Before
+### After
+-->
+
+<!-- If there is anything about the deploy, please make a note. -->
+
+# Deploy Notes
+New environment variable TWITTER_TARGET_USERS needs to be configured if using custom target users
+
+
+
+## Database changes
+no database changes needed
+
+<!--  If there is something more than the automated steps, please specifiy deploy instructions. -->
+<!--
+## Deployment instructions
+-->
+
+<!-- If you are on Discord, please join https://discord.gg/ai16z and state your Discord username here for contribute role and join us in #development-feed -->
+
+## Discord username
+tharakesh5545
+
+
+
+### Changes Overview
+- `.env.example`: 1 changes (+1 -0)
+- `packages/client-twitter/src/interactions.ts`: 143 changes (+112 -31)
+
+### Technical Impact
+This change impacts the following areas:
+- .env.example: 1 changes
+- packages: 143 changes
+</DiscussionSection>
