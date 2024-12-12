@@ -1,4 +1,5 @@
 import { Citation } from "@/types/chat";
+import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { Message } from "ai";
 import clsx from "clsx";
 import dynamic from "next/dynamic";
@@ -21,9 +22,23 @@ interface ChatMessageProps {
   message: Message;
   i: number;
   citations?: Citation[];
+  followUpPrompts?: string[];
+  onFollowUpClick?: (prompt: string) => void;
 }
 
-export function ChatMessage({ message, i, citations }: ChatMessageProps) {
+export function ChatMessage({
+  message,
+  i,
+  citations,
+  followUpPrompts,
+  onFollowUpClick,
+}: ChatMessageProps) {
+  console.log({
+    message,
+    i,
+    citations,
+    followUpPrompts,
+  });
   return (
     <div
       key={message.id}
@@ -58,15 +73,8 @@ export function ChatMessage({ message, i, citations }: ChatMessageProps) {
               },
               reference: {
                 component: ({ children, index }) => {
-                  // Citation references are already 0-based in the markdown
                   const citationIndex = Number(index);
                   const citation = citations?.[citationIndex];
-
-                  console.log("reference", {
-                    citation,
-                    citations,
-                    citationIndex,
-                  });
 
                   return (
                     <a
@@ -97,26 +105,32 @@ export function ChatMessage({ message, i, citations }: ChatMessageProps) {
         </Markdown>
       </Suspense>
 
-      {/* {citations && citations.length > 0 && (
-        <div className="text-sm pt-4">
-          <div className="font-medium mb-2">Sources:</div>
-          <div className="space-y-2">
-            {citations.map((citation, index) => (
-              <div key={index} className="text-zinc-600 dark:text-zinc-400">
-                {index + 1}.{" "}
-                <a
-                  href={citation.url}
-                  className="underline hover:text-zinc-900 dark:hover:text-zinc-100"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {citation.title}
-                </a>
-              </div>
+      {followUpPrompts && followUpPrompts.length > 0 && (
+        <div className="mt-2 border-t border-zinc-950/5 dark:border-zinc-950/5">
+          {/* <h3 className="text-base font-normal text-zinc-500">Related</h3> */}
+          <div className="flex flex-col divide-y divide-zinc-950/5 dark:divide-zinc-950/5">
+            {followUpPrompts.map((prompt, index) => (
+              <button
+                key={index}
+                onClick={() => onFollowUpClick?.(prompt)}
+                className={clsx([
+                  "flex items-center justify-between",
+                  "py-2",
+                  "bg-transparent",
+                  "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200",
+                  "transition-colors",
+                  "group cursor-pointer",
+                  "text-left text-sm",
+                  "w-full",
+                ])}
+              >
+                <span>{prompt}</span>
+                <ArrowRightIcon className="w-3 h-3 text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-200 flex-shrink-0" />
+              </button>
             ))}
           </div>
         </div>
-      )} */}
+      )}
     </div>
   );
 }

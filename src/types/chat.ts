@@ -17,4 +17,5 @@ export interface ChatRequest {
 export interface ChatResponse extends ChatStreamData {
   id: string;
   messages: Message[];
+  followUpPrompts?: string[];
 }

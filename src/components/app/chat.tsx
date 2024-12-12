@@ -18,6 +18,7 @@ export const Chat = () => {
     isLoading,
     setInput,
     data,
+    append,
   } = useChat({
     api: "/api/search",
     onError: (error) => {
@@ -34,7 +35,28 @@ export const Chat = () => {
     );
   }, [data]);
 
-  console.log({ citations });
+  const followUpPrompts = useMemo(() => {
+    return (
+      (data as unknown as ChatResponse[])?.reduce((acc, d, index) => {
+        acc[index - 1] = d.followUpPrompts || [];
+        return acc;
+      }, {} as Record<number, string[]>) || {}
+    );
+  }, [data]);
+
+  const handleFollowUpClick = useCallback(
+    (prompt: string) => {
+      if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
+        append({
+          content: prompt,
+          role: "user",
+        });
+      } else {
+        toast.info("Coming soon!");
+      }
+    },
+    [append]
+  );
 
   // Memoize handlers
   const onInputChange = useCallback(handleInputChange, [handleInputChange]);
@@ -92,7 +114,12 @@ export const Chat = () => {
   return (
     <main className="flex flex-col size-full relative md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] mx-auto w-full px-4 md:px-0 min-h-dvh">
       <div className="flex-1 pt-16 pb-8">
-        <ChatMessages messages={messages} citationsMap={citations} />
+        <ChatMessages
+          messages={messages}
+          citationsMap={citations}
+          followUpPromptsMap={followUpPrompts}
+          onFollowUpClick={handleFollowUpClick}
+        />
       </div>
       <div className="sticky w-full md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] mx-auto left-0 right-0 bottom-0 pb-4  bg-white dark:bg-black rounded-t-lg">
         <TextareaWithActions {...textareaProps} />

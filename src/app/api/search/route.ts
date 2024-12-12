@@ -1,7 +1,46 @@
 import { createTurso } from "@/libs/indexer/utils/create-turso";
 import { embed } from "@/libs/indexer/utils/embed";
 import { getCerebrasModel } from "@/libs/indexer/utils/models";
-import { createDataStreamResponse, streamText } from "ai";
+import { createDataStreamResponse, generateObject, streamText } from "ai";
+import { z } from "zod";
+
+const generateFollowUpPrompts = async (
+  model: any,
+  query: string,
+  context: string
+) => {
+  const result = await generateObject({
+    model,
+    schema: z.object({
+      followUpPrompts: z
+        .array(z.string())
+        .describe("3 relevant follow-up questions related to the query"),
+    }),
+    system: `
+<info>
+    You are a helpful assistant called Eliza.gg and you assist community members with questions about the Eliza open source framework and the ElizaOS operating system.
+
+    - ElizaOS is the Operating System for AI Agents.
+    - Eliza is a powerful multi-agent simulation framework designed to create, deploy, and manage autonomous AI agents. Built with TypeScript, it provides a flexible and extensible platform for developing intelligent agents that can interact across multiple platforms while maintaining consistent personalities and knowledge.
+    - ai16z is the first venture capital firm led by AI agents. The project is led by an AI agent modeled after venture capitalist Marc Andreessen and aims to leverage AI and collective intelligence to make investment decisions. Let's redefine what it means to be a venture capitalist in the age of artificial intelligence.
+    - Autonomous Trading: Marc leverages ai16z's assets under management to execute precise trade strategies. His decisions are also influenced by alpha from partners.
+    - Marketplace of Trust: Marc assigns trust scores to everyone he interacts with, enabling him to curate an order book of the most reliable alpha from every conversation.
+    - Marc Everywhere: Every interaction Marc has—whether in Telegram alpha chats or on his X account—feeds into a powerful data flywheel, continuously enhancing his alpha.
+</info>
+
+<context>
+    ${context}
+</context>
+
+Given the user's question and the context of the conversation, generate 3 natural follow-up questions that would help explore the topic further. The questions should be specific and directly related to the topic.
+    `.trim(),
+    prompt: `
+The user query is: "${query}"
+    `.trim(),
+  });
+
+  return result.object.followUpPrompts;
+};
 
 export async function POST(request: Request) {
   if (process.env.NEXT_PUBLIC_NODE_ENV !== "development") {
@@ -162,6 +201,17 @@ You are a helpful assistant called Eliza.gg and you assist community members wit
 
 `.trim(),
         messages,
+      });
+
+      // After the main response is complete, generate and stream follow-up prompts
+      const followUpPrompts = await generateFollowUpPrompts(
+        getCerebrasModel("llama-3.3-70b"),
+        query,
+        results
+      );
+
+      dataStream.writeData({
+        followUpPrompts,
       });
 
       result.mergeIntoDataStream(dataStream);

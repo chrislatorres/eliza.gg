@@ -8,13 +8,29 @@ import { useEffect, useRef } from "react";
 interface ChatMessagesProps {
   messages: Message[];
   citationsMap: Record<number, Citation[]>;
+  followUpPromptsMap: Record<number, string[]>;
+  onFollowUpClick: (prompt: string) => void;
 }
 
-export function ChatMessages({ messages, citationsMap }: ChatMessagesProps) {
+export function ChatMessages({
+  messages,
+  citationsMap,
+  followUpPromptsMap,
+  onFollowUpClick,
+}: ChatMessagesProps) {
+  console.log({ messages, citationsMap, followUpPromptsMap });
   const lastMessageRef = useRef<HTMLDivElement>(null);
 
-  // Keep track of assistant message count
-  let assistantIndex = -1;
+  // Calculate assistantIndex for each message
+  const getAssistantIndex = (messages: Message[], currentIndex: number) => {
+    // For each assistant message, we want to return its position * 2
+    return (
+      (messages.slice(0, currentIndex + 1).filter((m) => m.role === "assistant")
+        .length -
+        1) *
+      2
+    );
+  };
 
   useEffect(() => {
     window.scrollTo({
@@ -39,10 +55,13 @@ export function ChatMessages({ messages, citationsMap }: ChatMessagesProps) {
   return (
     <div className="flex flex-col gap-4 whitespace-normal break-words">
       {messages.map((message, i) => {
-        // Increment assistant index only for assistant messages
-        if (message.role === "assistant") {
-          assistantIndex++;
-        }
+        const assistantIndex =
+          message.role === "assistant" ? getAssistantIndex(messages, i) : -1;
+
+        const followUpPrompts =
+          message.role === "assistant"
+            ? followUpPromptsMap[assistantIndex]
+            : undefined;
 
         return (
           <div
@@ -57,6 +76,8 @@ export function ChatMessages({ messages, citationsMap }: ChatMessagesProps) {
                   ? citationsMap[assistantIndex]
                   : undefined
               }
+              followUpPrompts={followUpPrompts}
+              onFollowUpClick={onFollowUpClick}
             />
           </div>
         );
