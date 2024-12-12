@@ -17,9 +17,9 @@ const generateFollowUpPrompts = async (
         .describe("3 relevant follow-up questions related to the query"),
     }),
     system: `
-<info>
-    You are a helpful assistant called Eliza.gg and you assist community members with questions about the Eliza open source framework and the ElizaOS operating system.
+You generate follow up prompts for a chatbot. The follow up prompts are from the perspective of the end user. This is basically like Google's "People also ask" section.
 
+<info>
     - ElizaOS is the Operating System for AI Agents.
     - Eliza is a powerful multi-agent simulation framework designed to create, deploy, and manage autonomous AI agents. Built with TypeScript, it provides a flexible and extensible platform for developing intelligent agents that can interact across multiple platforms while maintaining consistent personalities and knowledge.
     - ai16z is the first venture capital firm led by AI agents. The project is led by an AI agent modeled after venture capitalist Marc Andreessen and aims to leverage AI and collective intelligence to make investment decisions. Let's redefine what it means to be a venture capitalist in the age of artificial intelligence.
@@ -32,7 +32,7 @@ const generateFollowUpPrompts = async (
     ${context}
 </context>
 
-Given the user's question and the context of the conversation, generate 3 natural follow-up questions that would help explore the topic further. The questions should be specific and directly related to the topic.
+Given the user's question and the context of the conversation, generate 3 natural follow-up questions from the perspective of the end user that would help explore the topic further. The questions should be specific and directly related to the topic.
     `.trim(),
     prompt: `
 The user query is: "${query}"
