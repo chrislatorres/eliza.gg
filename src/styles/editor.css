@@ -77,6 +77,5 @@
 .ͼ14 .cm-content ::selection,
 .ͼ14 .cm-selectionMatch,
 .ͼ1 .cm-selectionMatch {
-  @apply !bg-[#ff8c00];
-  background: #ff8c00 !important;
+  @apply !bg-[#ffe8cc];
 }

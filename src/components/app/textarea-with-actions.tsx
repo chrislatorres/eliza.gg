@@ -35,7 +35,7 @@ const ChatForm = memo(function ChatForm({
           aria-label="Prompt"
           value={input}
           onChange={onInputChange}
-          placeholder="Ask a question about Eliza..."
+          placeholder="Ask a follow up..."
           className={clsx([
             "size-full bg-transparent",
             "relative block size-full appearance-none",

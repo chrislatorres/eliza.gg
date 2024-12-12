@@ -72,11 +72,11 @@ export const Chat = () => {
   );
 
   return (
-    <main className="flex flex-col size-full relative max-w-xl mx-auto w-full">
+    <main className="flex flex-col size-full relative md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] mx-auto w-full">
       <div className="flex-1 pt-16 pb-32  px-4 md:px-0">
         <ChatMessages messages={messages} citations={citations} />
       </div>
-      <div className="fixed w-full max-w-xl mx-auto left-0 right-0 bottom-0 py-4  px-4 md:px-0">
+      <div className="fixed w-full md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] mx-auto left-0 right-0 bottom-0 pb-4 pt-0.5 px-4 md:px-0 bg-white dark:bg-black">
         <TextareaWithActions {...textareaProps} />
       </div>
     </main>

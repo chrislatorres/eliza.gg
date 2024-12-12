@@ -12,26 +12,17 @@
   --foreground: white;
 }
 
-.prose :where(p:last-child) {
-  @apply !mb-0;
-}
-
 .prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
   @apply !px-0 !py-0;
 }
-
-.prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+/* .prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
   @apply !mb-0;
-}
+} */
 
 .prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
   @apply !bg-transparent;
 }
 
-.prose :where(ol):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-  @apply !mt-0;
-}
-
-.prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-  @apply !mt-0;
+.prose :where(p:last-child) {
+  @apply !mb-0;
 }

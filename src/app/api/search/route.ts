@@ -1,6 +1,6 @@
 import { createTurso } from "@/libs/indexer/utils/create-turso";
 import { embed } from "@/libs/indexer/utils/embed";
-import { getOpenRouterModel } from "@/libs/indexer/utils/models";
+import { getCerebrasModel } from "@/libs/indexer/utils/models";
 import { createDataStreamResponse, streamText } from "ai";
 
 export async function POST(request: Request) {
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
       });
 
       const result = streamText({
-        model: getOpenRouterModel("anthropic/claude-3.5-sonnet:beta"),
+        model: getCerebrasModel("llama-3.3-70b"),
         system: `
 
 You are a helpful assistant called Eliza.gg and you assist community members with questions about the Eliza open source framework and the ElizaOS operating system.
