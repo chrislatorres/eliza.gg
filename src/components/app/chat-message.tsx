@@ -16,9 +16,8 @@ export function ChatMessage({ message, i, citations }: ChatMessageProps) {
       key={message.id}
       className={clsx([
         "w-full",
-        "prose prose-slate dark:prose-invert !max-w-full",
+        "prose prose-zinc dark:prose-invert !max-w-full",
         "prose-headings:mt-0 prose-headings:mb-0  prose-headings:my-0 prose-p:mt-0 ",
-        message.role === "user" ? "text-3xl font-semibold" : "",
         message.role === "user" && i !== 0
           ? "border-t pt-4 border-zinc-950/5 dark:border-white/5"
           : "",
@@ -66,7 +65,9 @@ export function ChatMessage({ message, i, citations }: ChatMessageProps) {
           },
         }}
       >
-        {message.content as string}
+        {message.role === "user"
+          ? `# ${message.content}`
+          : (message.content as string)}
       </Markdown>
 
       {/* {citations && citations.length > 0 && (

@@ -138,7 +138,7 @@ We may update these Terms at any time. Changes will be effective upon posting to
 
   return (
     <div
-      className="prose prose-slate dark:prose-invert mx-auto p-4 lg:max-w-2xl"
+      className="prose prose-zinc dark:prose-invert mx-auto p-4 lg:max-w-2xl"
       suppressHydrationWarning
     >
       <Markdown>{termsOfService}</Markdown>
