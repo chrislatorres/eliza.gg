@@ -30,10 +30,7 @@ export function CodeBlock({ className, children }) {
   useEffect(() => {
     if (!children.includes("\n")) return;
 
-    let trimmedContent = children.trim();
-    if (children.startsWith("javascript\n")) {
-      trimmedContent = trimmedContent.replace("javascript\n", "").trim();
-    }
+    let trimmedContent = children;
 
     const state = EditorState.create({
       doc: trimmedContent,

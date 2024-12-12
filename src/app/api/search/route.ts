@@ -106,6 +106,7 @@ You are a helpful assistant called Eliza.gg and you assist community members wit
     - Respond to the end user as a friendly assistant, do not mention the context or references.
     - Respond with a formatted markdown response using best markdown practices. Like prose double newlines between paragraphs.
     - When responding with codeblocks include the language inline with the opening backticks for example \`\`\`typescript or \`\`\`bash.
+    - ALWAYS include 2 newlines before and after codeblocks.
 </response-rules>
 
 `.trim(),

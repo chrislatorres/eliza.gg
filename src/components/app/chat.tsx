@@ -71,6 +71,7 @@ export const Chat = () => {
     [input, onInputChange, onSubmit, isLoading]
   );
 
+  console.log({ messages });
   return (
     <main className="flex flex-col size-full relative md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] mx-auto w-full">
       <div className="flex-1 pt-16 pb-32  px-4 md:px-0">
