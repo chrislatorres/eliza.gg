@@ -104,7 +104,7 @@ export function ChatMessage({
             }}
           >
             {message.role === "user"
-              ? `# ${message.content}`
+              ? `### ${message.content}`
               : (message.content as string)}
           </Markdown>
         </Suspense>
