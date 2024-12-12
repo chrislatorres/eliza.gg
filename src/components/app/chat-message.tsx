@@ -105,32 +105,33 @@ export function ChatMessage({
         </Markdown>
       </Suspense>
 
-      {followUpPrompts && followUpPrompts.length > 0 && (
-        <div className="mt-2 border-t border-zinc-950/5 dark:border-zinc-950/5">
-          {/* <h3 className="text-base font-normal text-zinc-500">Related</h3> */}
-          <div className="flex flex-col divide-y divide-zinc-950/5 dark:divide-zinc-950/5">
-            {followUpPrompts.map((prompt, index) => (
-              <button
-                key={index}
-                onClick={() => onFollowUpClick?.(prompt)}
-                className={clsx([
-                  "flex items-center justify-between",
-                  "py-2",
-                  "bg-transparent",
-                  "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200",
-                  "transition-colors",
-                  "group cursor-pointer",
-                  "text-left text-sm",
-                  "w-full",
-                ])}
-              >
-                <span>{prompt}</span>
-                <ArrowRightIcon className="w-3 h-3 text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-200 flex-shrink-0" />
-              </button>
-            ))}
+      {message.role === "assistant" &&
+        followUpPrompts &&
+        followUpPrompts.length > 0 && (
+          <div className="mt-4 border-t border-zinc-950/5 dark:border-zinc-950/5 pt-4">
+            <div className="flex flex-col divide-y divide-zinc-950/5 dark:divide-zinc-950/5">
+              {followUpPrompts.map((prompt, index) => (
+                <button
+                  key={index}
+                  onClick={() => onFollowUpClick?.(prompt)}
+                  className={clsx([
+                    "flex items-center justify-between",
+                    "py-2",
+                    "bg-transparent",
+                    "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200",
+                    "transition-colors",
+                    "group cursor-pointer",
+                    "text-left text-sm",
+                    "w-full",
+                  ])}
+                >
+                  <span>{prompt}</span>
+                  <ArrowRightIcon className="w-3 h-3 text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-200 flex-shrink-0" />
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 }
