@@ -1,8 +1,21 @@
-import { CodeBlock } from "@/components/app/code-block";
 import { Citation } from "@/types/chat";
 import { Message } from "ai";
 import clsx from "clsx";
-import Markdown from "markdown-to-jsx";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
+
+// Lazy load markdown-to-jsx
+const Markdown = dynamic(() => import("markdown-to-jsx"), {
+  ssr: true,
+});
+
+// Lazy load CodeBlock component
+const CodeBlock = dynamic(
+  () => import("@/components/app/code-block").then((mod) => mod.CodeBlock),
+  {
+    ssr: true,
+  }
+);
 
 interface ChatMessageProps {
   message: Message;
@@ -23,52 +36,54 @@ export function ChatMessage({ message, i, citations }: ChatMessageProps) {
           : "",
       ])}
     >
-      <Markdown
-        options={{
-          forceBlock: true,
-          overrides: {
-            // p: (props) => (
-            //   <div
-            //     className={clsx(["flex items-center", props.className])}
-            //     {...props}
-            //   />
-            // ),
-            // pre: (props) => (
-            //   <pre
-            //     className={clsx(["!px-0 !py-0 !mb-0 !mt-4", props.className])}
-            //     {...props}
-            //   />
-            // ),
-            code: {
-              component: CodeBlock,
+      <Suspense fallback={null}>
+        <Markdown
+          options={{
+            forceBlock: true,
+            overrides: {
+              // p: (props) => (
+              //   <div
+              //     className={clsx(["flex items-center", props.className])}
+              //     {...props}
+              //   />
+              // ),
+              // pre: (props) => (
+              //   <pre
+              //     className={clsx(["!px-0 !py-0 !mb-0 !mt-4", props.className])}
+              //     {...props}
+              //   />
+              // ),
+              code: {
+                component: CodeBlock,
+              },
+              reference: {
+                component: ({ children, index }) => (
+                  <a
+                    href={citations?.[index]?.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={clsx([
+                      "inline-flex items-center justify-center",
+                      "align-super text-[0.6em] font-normal",
+                      "no-underline rounded-sm",
+                      "text-[#ff8c00]",
+                      "hover:text-[#cc7000]",
+                      "py-0.5",
+                      "leading-none",
+                    ])}
+                  >
+                    [{children}]
+                  </a>
+                ),
+              },
             },
-            reference: {
-              component: ({ children, index }) => (
-                <a
-                  href={citations?.[index]?.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={clsx([
-                    "inline-flex items-center justify-center",
-                    "align-super text-[0.6em] font-normal",
-                    "no-underline rounded-sm",
-                    "text-[#ff8c00]",
-                    "hover:text-[#cc7000]",
-                    "py-0.5",
-                    "leading-none",
-                  ])}
-                >
-                  [{children}]
-                </a>
-              ),
-            },
-          },
-        }}
-      >
-        {message.role === "user"
-          ? `# ${message.content}`
-          : (message.content as string)}
-      </Markdown>
+          }}
+        >
+          {message.role === "user"
+            ? `# ${message.content}`
+            : (message.content as string)}
+        </Markdown>
+      </Suspense>
 
       {/* {citations && citations.length > 0 && (
         <div className="text-sm pt-4">

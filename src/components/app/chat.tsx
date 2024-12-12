@@ -71,6 +71,18 @@ export const Chat = () => {
     [input, onInputChange, onSubmit, isLoading]
   );
 
+  // Add this near the top of your chat component
+  useEffect(() => {
+    // Preload markdown and code block components
+    const preload = async () => {
+      await Promise.all([
+        import("markdown-to-jsx"),
+        import("@/components/app/code-block"),
+      ]);
+    };
+    preload();
+  }, []);
+
   console.log({ messages });
   return (
     <main className="flex flex-col size-full relative md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] mx-auto w-full">
