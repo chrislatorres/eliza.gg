@@ -79,10 +79,10 @@ export function BlogComments({ postSlug, postContent, initialComments = [] }: Bl
     }, {} as Record<string, BlogComment[]>);
 
     const CommentThread = ({ comment }: { comment: BlogComment }) => (
-        <div className="border-b border-gray-800 pb-6">
+        <div className="border-b border-zinc-900 pb-6">
             <p className="text-gray-300 mb-2">{comment.userMessage}</p>
             {comment.aiResponse !== "Temporary response" && (
-                <div className="ml-6 mt-4 p-4 bg-gray-800 rounded-lg">
+                <div className="ml-6 mt-4 p-4 bg-zinc-900 rounded-lg">
                     <p className="text-orange-400 font-medium mb-2">Eliza</p>
                     <p className="text-gray-300">{comment.aiResponse}</p>
                 </div>

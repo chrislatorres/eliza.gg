@@ -7,7 +7,7 @@ interface ChatCommentsToggleProps {
 
 export function ChatCommentsToggle({ mode, onToggle }: ChatCommentsToggleProps) {
     return (
-        <div className="flex space-x-1 bg-gray-800 p-1 rounded-lg">
+        <div className="flex space-x-1 bg-zinc-900 p-1 rounded-lg">
             <button
                 onClick={() => onToggle('chat')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${mode === 'chat'

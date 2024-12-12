@@ -1,5 +1,5 @@
 import { ensureBlogCommentsTable } from "@/lib/comments";
-import { getAIResponse } from "@/lib/openrouter";
+import { getCompletion } from "@/lib/openrouter";
 import { createTurso } from "@/libs/indexer/utils/create-turso";
 import { nanoid } from "nanoid";
 
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
         if (isAiMention) {
             try {
                 console.log('Requesting AI response for:', userMessage);
-                aiResponse = await getAIResponse(userMessage, postContent);
+                aiResponse = await getCompletion(userMessage, postContent);
                 console.log('AI response generated:', aiResponse);
             } catch (error) {
                 console.error('AI response error:', error);
