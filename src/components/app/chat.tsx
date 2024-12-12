@@ -113,7 +113,7 @@ export const Chat = () => {
 
   return (
     <main className="flex flex-col size-full relative md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] mx-auto w-full px-4 md:px-0 min-h-dvh">
-      <div className="flex-1 pt-16 pb-8">
+      <div className="flex-1 pt-16 pb-4">
         <ChatMessages
           messages={messages}
           citationsMap={citations}
