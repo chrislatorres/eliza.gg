@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS docs (
 console.timeEnd("db-setup");
 
 const urls = [
+  // Core docs
   "https://ai16z.github.io/eliza/docs/intro/",
   "https://ai16z.github.io/eliza/docs/quickstart/",
   "https://ai16z.github.io/eliza/docs/faq/",
@@ -56,6 +57,30 @@ const urls = [
   "https://ai16z.github.io/eliza/docs/packages/clients/",
   "https://ai16z.github.io/eliza/docs/packages/agent/",
   "https://ai16z.github.io/eliza/docs/packages/plugins/",
+  // Streams
+  "https://ai16z.github.io/eliza/community/Streams/10-2024/2024-10-25/",
+  "https://ai16z.github.io/eliza/community/Streams/10-2024/2024-10-27/",
+  "https://ai16z.github.io/eliza/community/Streams/10-2024/2024-10-29/",
+  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-08/",
+  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-06/",
+  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-10/",
+  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-15/",
+  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-22/",
+  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-26/",
+  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-21/",
+  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-24/",
+  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-28/",
+  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-29/",
+  "https://ai16z.github.io/eliza/community/Streams/12-2024/2024-12-03/",
+  "https://ai16z.github.io/eliza/community/Streams/12-2024/2024-12-05/",
+  "https://ai16z.github.io/eliza/community/Streams/12-2024/2024-12-06/",
+  "https://ai16z.github.io/eliza/community/Streams/12-2024/2024-12-01/",
+  // Community
+  "https://ai16z.github.io/eliza/community/",
+  // Creator fund
+  "https://ai16z.github.io/eliza/community/creator-fund/",
+  // GitHub contributor profiles
+  "https://ai16z.github.io/profiles/",
 ];
 
 console.time("fetch-all");
