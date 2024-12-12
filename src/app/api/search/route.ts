@@ -9,7 +9,13 @@ const generateFollowUpPrompts = async (
   query: string,
   context: string
 ) => {
+  console.log({
+    model,
+    query,
+    context,
+  });
   const result = await generateObject({
+    maxRetries: 3,
     model,
     schema: z.object({
       followUpPrompts: z
@@ -18,6 +24,10 @@ const generateFollowUpPrompts = async (
     }),
     system: `
 You generate follow up prompts for a chatbot. The follow up prompts are from the perspective of the end user. This is basically like Google's "People also ask" section.
+
+<context>
+    ${context}
+</context>
 
 <info>
     - ElizaOS is the Operating System for AI Agents.
@@ -28,16 +38,14 @@ You generate follow up prompts for a chatbot. The follow up prompts are from the
     - Marc Everywhere: Every interaction Marc has—whether in Telegram alpha chats or on his X account—feeds into a powerful data flywheel, continuously enhancing his alpha.
 </info>
 
-<context>
-    ${context}
-</context>
-
 Given the user's question and the context of the conversation, generate 3 natural follow-up questions from the perspective of the end user that would help explore the topic further. The questions should be specific and directly related to the topic.
     `.trim(),
     prompt: `
 The user query is: "${query}"
     `.trim(),
   });
+
+  console.log({ result });
 
   return result.object.followUpPrompts;
 };
@@ -160,7 +168,7 @@ export async function POST(request: Request) {
           <citations-rules>
               - Always cite your sources.
               - When citing, respond with citation tag.
-              - When referencing information, cite the source using <reference index={1}>1</reference>, <reference index={2}>2</reference>, etc. corresponding to the order of citations provided. The index is the index of the citation in the citations array.
+              - When referencing information, cite the source using <reference index={1}>Get Started</reference>, <reference index={2}>Quickstart</reference>, etc. corresponding to the order of citations provided. The index is the index of the citation in the citations array, and the title is the short title of the citation.
               - At the end of the response, do not list the references, you are only citing.
               - Do NOT tell the user to go/explore/refer to the documentation or references.
               - DO NOT say anything like "For more information, you can refer to the documentation." or "For more information on the available commands, you can check the Local Development Guide".
@@ -199,7 +207,7 @@ export async function POST(request: Request) {
                       How do I install ai16z?
                   </question>
                   <answer>
-                      To install ai16z, you can use the Eliza framework. <reference index={1}>1</reference>
+                      To install ai16z, you can use the Eliza framework. <reference index={1}>Get Started</reference>
 
 
                       \`\`\`bash
