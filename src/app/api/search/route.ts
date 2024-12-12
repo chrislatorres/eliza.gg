@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "Not allowed" }, { status: 403 });
   }
 
-  const { messages } = await request.json();
+  const { messages, postSlug, postContent, isPostChat } = await request.json();
   const lastMessage = messages[messages.length - 1];
   const query = lastMessage.content;
 
@@ -43,31 +43,39 @@ export async function POST(request: Request) {
     .map((row, i) => `Reference #${i + 1}: \n${row[3]}`)
     .join("\n");
 
-  console.log(results);
-
-  const searchResults = rows.map((row) => ({
-    url: row[2] as string,
-    content: row[3] as string,
-  }));
+  // Add post content to context if this is a post chat
+  const additionalContext = isPostChat ? `
+Current Blog Post:
+${postContent}
+` : '';
 
   return createDataStreamResponse({
     execute: async (dataStream) => {
       // Write initial citations
       dataStream.writeData({
-        citations: searchResults.map((result) => ({
-          url: result.url,
-          content: result.content.slice(0, 200) + "...", // Preview of content
-          title: result.content.split("Title: ")[1].split("\n")[0],
-        })),
+        citations: [
+          // Include post as first citation if this is a post chat
+          ...(isPostChat ? [{
+            url: `/feed/${postSlug}`,
+            content: postContent.slice(0, 200) + "...",
+            title: "Current Blog Post"
+          }] : []),
+          // Include search results
+          ...searchResults.map((result) => ({
+            url: result.url,
+            content: result.content.slice(0, 200) + "...",
+            title: result.content.split("Title: ")[1].split("\n")[0],
+          })),
+        ],
       });
 
       const result = streamText({
         model: getCerebrasModel("llama-3.3-70b"),
         system: `
-
-You are a helpful assistant called Eliza.gg and you assist community members with questions about the Eliza open source framework and the ElizaOS operating system.
+${isPostChat ? `You are discussing the current blog post and related documentation.` : `You are a helpful assistant called Eliza.gg`}
 
 <relevant-docs>
+    ${additionalContext}
     ${results}
 </relevant-docs>
 

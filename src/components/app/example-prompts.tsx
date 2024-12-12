@@ -22,7 +22,7 @@ export function ExamplePrompts({ onPromptSelect }: ExamplePromptsProps) {
             // Base
             "relative isolate inline-flex items-center justify-center gap-x-2 rounded-md border text-base/6 font-medium",
             // Focus
-            "focus:outline-none focus:outline-2 focus:outline-offset-2 focus:outline-indigo-500",
+            "focus:outline-none focus:outline-2 focus:outline-offset-2 focus:outline-orange-500",
             // Disabled
             "disabled:opacity-50 disabled:pointer-events-none",
             // Icon
