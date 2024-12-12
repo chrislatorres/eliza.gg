@@ -30,7 +30,7 @@ export function CodeBlock({ className, children }) {
   useEffect(() => {
     if (!children.includes("\n")) return;
 
-    let trimmedContent = children;
+    let trimmedContent = children.trimEnd();
 
     const state = EditorState.create({
       doc: trimmedContent,
@@ -73,7 +73,7 @@ export function CodeBlock({ className, children }) {
   return children.includes("\n") ? (
     <div className="not-prose">
       <div className="read-only-editor w-full bg-zinc-50 dark:bg-zinc-950 rounded-md overflow-hidden max-w-full min-w-full border border-zinc-950/5 dark:border-white/5">
-        <div className="bg-zinc-100 dark:bg-zinc-900 flex items-center pl-4 pr-2 text-xs font-sans py-2 text-zinc-500 border-b border-zinc-950/5 dark:border-white/5">
+        <div className="bg-zinc-100 dark:bg-zinc-900 flex items-center pl-4 pr-2 text-xs font-sans py-1 text-zinc-500 border-b border-zinc-950/5 dark:border-white/5">
           <span>{language}</span>
           <div className="ml-auto">
             <button
