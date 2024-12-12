@@ -1,6 +1,13 @@
 import { basicSetup } from "@/components/app/basic-setup";
 import "@/styles/editor.css";
+import { css } from "@codemirror/lang-css";
+import { html } from "@codemirror/lang-html";
 import { javascript } from "@codemirror/lang-javascript";
+import { json } from "@codemirror/lang-json";
+import { markdown } from "@codemirror/lang-markdown";
+import { sql } from "@codemirror/lang-sql";
+import { StreamLanguage } from "@codemirror/language";
+import { shell as shellMode } from "@codemirror/legacy-modes/mode/shell";
 import { EditorState } from "@codemirror/state";
 import { drawSelection } from "@codemirror/view";
 import { CheckIcon, ClipboardIcon } from "@heroicons/react/24/outline";
@@ -11,20 +18,50 @@ import { useTheme } from "next-themes";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 export function CodeBlock({ className, children }) {
+  console.log({ className });
   const [copySuccess, setCopySuccess] = useState("");
   const { resolvedTheme } = useTheme();
   const [element, setElement] = useState<HTMLElement>();
 
   const language = useMemo(() => {
-    if (children?.startsWith?.("javascript\n")) {
-      return "javascript";
-    }
     return className?.replace("lang-", "") || "";
   }, [children, className]);
 
   const ref = useCallback((node: HTMLElement | null) => {
     if (!node) return;
     setElement(node);
+  }, []);
+
+  const getLanguageExtension = useCallback((lang: string) => {
+    switch (lang.toLowerCase()) {
+      case "javascript":
+      case "js":
+        return javascript();
+      case "typescript":
+      case "ts":
+        return javascript({ typescript: true });
+      case "jsx":
+        return javascript({ jsx: true });
+      case "tsx":
+        return javascript({ typescript: true, jsx: true });
+      case "json":
+        return json();
+      case "bash":
+      case "shell":
+      case "sh":
+        return StreamLanguage.define(shellMode);
+      case "css":
+        return css();
+      case "html":
+        return html();
+      case "markdown":
+      case "md":
+        return markdown();
+      case "sql":
+        return sql();
+      default:
+        return javascript(); // fallback to javascript
+    }
   }, []);
 
   useEffect(() => {
@@ -36,7 +73,7 @@ export function CodeBlock({ className, children }) {
       doc: trimmedContent,
       extensions: [
         basicSetup,
-        javascript(),
+        getLanguageExtension(language),
         EditorView.lineWrapping,
         EditorView.editable.of(false),
         resolvedTheme === "dark" ? githubDark : githubLight,
@@ -55,7 +92,7 @@ export function CodeBlock({ className, children }) {
     return () => {
       view?.destroy();
     };
-  }, [children, element, resolvedTheme]);
+  }, [children, element, resolvedTheme, language, getLanguageExtension]);
 
   const copyToClipboard = async () => {
     try {

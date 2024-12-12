@@ -39,12 +39,6 @@ export async function POST(request: Request) {
   });
   console.timeEnd("search");
 
-  const results = rows
-    .map((row, i) => `Reference #${i + 1}: \n${row[3]}`)
-    .join("\n");
-
-  console.log(results);
-
   const searchResults = rows.map((row) => ({
     url: row[2] as string,
     content: row[3] as string,
@@ -60,6 +54,22 @@ export async function POST(request: Request) {
           title: result.content.split("Title: ")[1].split("\n")[0],
         })),
       });
+
+      const results = searchResults
+        .map((result) => ({
+          url: result.url,
+          content: result.content,
+          title: result.content.split("Title: ")[1].split("\n")[0],
+        }))
+        .map(
+          (row, i) =>
+            `Reference Index #${i + 1} | Title: ${row.title}: \n\n${
+              row.content
+            } \n\n`
+        )
+        .join("\n");
+
+      console.log(results);
 
       const result = streamText({
         model: getCerebrasModel("llama-3.3-70b"),
@@ -95,19 +105,50 @@ You are a helpful assistant called Eliza.gg and you assist community members wit
     -  First phase where we implement and test functionality is in progress. Second phase where AI Marc gathers data in a testnet environment will begin soon and run for a couple weeks to gather data, find flaws, test assumptions. Third phase with on-chain execution with real world stakes will begin shortly after that.
 </ai16z-faq>
 
-<response-rules>
+<citations-rules>
     - Always cite your sources.
     - When citing, respond with citation tag.
-    - When referencing information, cite the source using <reference index={1}>1</reference>, <reference index={2}>2</reference>, etc. corresponding to the order of citations provided.
+    - When referencing information, cite the source using <reference index={1}>Getting Started</reference>, <reference index={2}>Installation</reference>, etc. corresponding to the order of citations provided. The index is the index of the citation in the citations array and the title is the title of the citation.
     - At the end of the response, do not list the references, you are only citing.
-    - Always put 2 newlines before markdown code blocks.
+</citations-rules>
+
+<response-rules>
     - If you don't know the answer, say "I don't know" and ask the user to refer to the relevant documentation.
     - Only respond to relevant questions about Eliza, ai16z, the ElizaOS operating system, community questions, or AI agent questions in general.
     - Respond to the end user as a friendly assistant, do not mention the context or references.
+</response-rules>
+
+<markdown-formatting-rules>
     - Respond with a formatted markdown response using best markdown practices. Like prose double newlines between paragraphs.
     - When responding with codeblocks include the language inline with the opening backticks for example \`\`\`typescript or \`\`\`bash.
-    - ALWAYS include 2 newlines before and after codeblocks.
-</response-rules>
+    - ALWAYS include 2 newlines (\\n\\n) before and after codeblocks.
+</markdown-formatting-rules>
+
+<examples>
+    <example>
+        <question>
+            How do I create an agent?
+        </question>
+        <answer>
+            To create an agent, you can use the Eliza framework.
+        </answer>
+    </example>
+    <example>
+        <question>
+            How do I install ai16z?
+        </question>
+        <answer>
+            To install ai16z, you can use the Eliza framework. <reference index={1}>Getting Started</reference>
+
+
+            \`\`\`bash
+            pnpm add @ai16z/core
+            \`\`\`
+
+
+        </answer>
+    </example>
+</examples>
 
 `.trim(),
         messages,
