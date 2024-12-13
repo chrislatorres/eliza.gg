@@ -5,7 +5,6 @@ import { ChatResponse, Citation } from "@/types/chat";
 import { useChat } from "ai/react";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
-import { toast } from "sonner";
 import { TextareaWithActions } from "./textarea-with-actions";
 
 export const Chat = () => {
@@ -46,14 +45,10 @@ export const Chat = () => {
 
   const handleFollowUpClick = useCallback(
     (prompt: string) => {
-      if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
-        append({
-          content: prompt,
-          role: "user",
-        });
-      } else {
-        toast.info("Coming soon!");
-      }
+      append({
+        content: prompt,
+        role: "user",
+      });
     },
     [append]
   );
@@ -64,11 +59,7 @@ export const Chat = () => {
   const onSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-      if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
-        handleSubmit(e);
-      } else {
-        toast.info("Coming soon!");
-      }
+      handleSubmit(e);
     },
     [handleSubmit]
   );
@@ -79,11 +70,7 @@ export const Chat = () => {
     if (query && messages.length === 0) {
       setInput(query);
       setTimeout(() => {
-        if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
-          handleSubmit(new Event("submit") as any);
-        } else {
-          toast.info("Coming soon!");
-        }
+        handleSubmit(new Event("submit") as any);
       }, 0);
     }
   }, [searchParams, messages.length, setInput, handleSubmit]);

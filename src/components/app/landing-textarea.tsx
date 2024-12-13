@@ -7,7 +7,6 @@ import clsx from "clsx";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
-import { toast } from "sonner";
 
 export const LandingTextarea = () => {
   const [input, setInput] = useState("");
@@ -42,12 +41,7 @@ export const LandingTextarea = () => {
   );
 
   const handlePromptSelect = useCallback((prompt: string) => {
-    if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
-      handleCreateSearch(prompt);
-    } else {
-      toast.info("Coming soon!");
-      return;
-    }
+    handleCreateSearch(prompt);
   }, []);
 
   return (
@@ -76,12 +70,7 @@ export const LandingTextarea = () => {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
-                handleSubmit(e);
-              } else {
-                toast.info("Coming soon!");
-                return;
-              }
+              handleSubmit(e);
             }}
             className="flex flex-col items-center justify-center"
           >
@@ -108,12 +97,7 @@ export const LandingTextarea = () => {
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
-                    if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
-                      handleSubmit(e);
-                    } else {
-                      toast.info("Coming soon!");
-                      return;
-                    }
+                    handleSubmit(e);
                   }
                 }}
               />

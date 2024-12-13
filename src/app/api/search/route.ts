@@ -51,10 +51,6 @@ The user query is: "${query}"
 };
 
 export async function POST(request: Request) {
-  if (process.env.NEXT_PUBLIC_NODE_ENV !== "development") {
-    return Response.json({ error: "Not allowed" }, { status: 403 });
-  }
-
   const { messages } = await request.json();
   const lastMessage = messages[messages.length - 1];
   const query = lastMessage.content;
