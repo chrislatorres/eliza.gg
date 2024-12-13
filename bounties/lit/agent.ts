@@ -90,56 +90,77 @@ class AutonomusKnowledgeAgent {
   ): Promise<VerificationResponse> {
     const verificationAction = `
       const verifyInfo = async () => {
-        const response = await fetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + Lit.Actions.getParam("apiKey")
-          },
-          body: JSON.stringify({
-            model: "gpt-4",
-            messages: [
-              {
-                role: "system",
-                content: "Verify if this query and context are consistent and factual."
-              },
-              {
-                role: "user",
-                content: Lit.Actions.getParam("query") + "\\n\\nContext:\\n" + Lit.Actions.getParam("context")
-              }
-            ]
-          })
-        });
-
-        const result = await response.json();
-        const verification = result.choices[0].message.content;
-
-        // Sign verification result if valid
-        const isVerified = verification.toLowerCase().includes("verified");
-        if (isVerified) {
-          const messageHash = viem.keccak256(viem.stringToHex(verification));
-          const sigShare = await Lit.Actions.signEcdsa({
-            toSign: messageHash,
-            publicKey: Lit.Actions.getParam("publicKey"),
-            sigName: "verification"
+        try {
+          const response = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: \`Bearer \${Lit.Actions.getParam("apiKey")}\`,
+            },
+            body: JSON.stringify({
+              model: "gpt-4",
+              messages: [
+                {
+                  role: "system",
+                  content: "Verify if this query and context are consistent and factual."
+                },
+                {
+                  role: "user",
+                  content: Lit.Actions.getParam("query") + "\\n\\nContext:\\n" + Lit.Actions.getParam("context")
+                }
+              ],
+              response_format: { type: "json_object" }  // Enforce JSON response
+            })
           });
-        }
 
-        return {
-          verified: isVerified,
-          message: verification
-        };
+          if (!response.ok) {
+            throw new Error(\`OpenAI API error: \${response.statusText}\`);
+          }
+
+          const result = await response.json();
+          if (!result.choices?.[0]?.message?.content) {
+            throw new Error('Invalid response format from OpenAI');
+          }
+
+          const verification = result.choices[0].message.content;
+          console.log("Verification result:", verification);  // Add logging
+
+          const isVerified = verification.toLowerCase().includes("verified");
+          if (isVerified) {
+            console.log("🔒 Signing verified content...");
+            const messageHash = viem.keccak256(viem.stringToHex(verification));
+            const sigShare = await Lit.Actions.signEcdsa({
+              toSign: messageHash,
+              publicKey: Lit.Actions.getParam("publicKey"),
+              sigName: "verification"
+            });
+            console.log("✅ Content signed successfully");
+          }
+
+          return {
+            verified: isVerified,
+            message: verification,
+            timestamp: Date.now()  // Add timestamp for tracking
+          };
+        } catch (error) {
+          console.error("❌ Error in verifyInfo:", error);
+          throw error;
+        }
       };
 
       (async () => {
         try {
           const result = await verifyInfo();
+          console.log("Final verification result:", result);
           Lit.Actions.setResponse({ response: result });
         } catch (e) {
+          console.error("❌ Error in Lit Action:", e);
           Lit.Actions.setResponse({
             response: {
               verified: false,
-              message: "Error: " + e.message
+              message: \`Error: \${e.message}\`,
+              error: true,
+              timestamp: Date.now()
             }
           });
         }
@@ -243,6 +264,76 @@ class AutonomusKnowledgeAgent {
       ...searchResult,
       verification: verifiedResult,
     };
+  }
+
+  async executeVerifiedTransaction(txData: any) {
+    const transactionAction = `
+      const executeTx = async () => {
+        try {
+          console.log("🔒 Preparing transaction...");
+          const signature = await Lit.Actions.signEcdsa({
+            toSign: Lit.Actions.getParam("txData"),
+            publicKey: Lit.Actions.getParam("publicKey"),
+            sigName: "transaction"
+          });
+
+          console.log("📝 Transaction signed, sending to network...");
+          const response = await Lit.Actions.runOnce(
+            { waitForResponse: true, name: "txSender" },
+            async () => {
+              try {
+                const provider = new ethers.providers.JsonRpcProvider(
+                  Lit.Actions.getParam("rpcUrl")
+                );
+                const tx = await provider.sendTransaction(signature);
+                return {
+                  success: true,
+                  hash: tx.hash,
+                  message: "Transaction sent successfully"
+                };
+              } catch (error) {
+                console.error("Transaction error:", error);
+                return {
+                  success: false,
+                  error: error.message
+                };
+              }
+            }
+          );
+
+          return response;
+        } catch (error) {
+          console.error("❌ Error in executeTx:", error);
+          throw error;
+        }
+      };
+
+      (async () => {
+        try {
+          const result = await executeTx();
+          Lit.Actions.setResponse({ response: result });
+        } catch (e) {
+          console.error("❌ Error in Lit Action:", e);
+          Lit.Actions.setResponse({
+            response: {
+              success: false,
+              error: e.message
+            }
+          });
+        }
+      })();
+    `;
+
+    const sessionSigs = await this.getSessionSigs();
+    return await this.litNodeClient.executeJs({
+      sessionSigs,
+      code: transactionAction,
+      jsParams: {
+        txData,
+        publicKey: this.account.address,
+        rpcUrl: process.env.RPC_URL,
+      },
+    });
   }
 }
 
