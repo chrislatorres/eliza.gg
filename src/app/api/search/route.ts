@@ -221,7 +221,8 @@ export async function POST(request: Request) {
           </examples>
 
         `.trim(),
-        messages,
+        // most recent message
+        messages: messages.slice(-1),
         onFinish: async () => {
           // Only send follow-ups after the main response is complete
           try {
