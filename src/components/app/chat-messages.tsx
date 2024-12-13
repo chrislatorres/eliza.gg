@@ -1,13 +1,10 @@
 "use client";
 
-import { ChatMessage } from "@/components/app/chat-message";
-import { Citation } from "@/types/chat";
-import { Message } from "ai";
 import { useEffect, useRef } from "react";
 
 interface ChatMessagesProps {
-  messages: Message[];
-  citations?: Citation[];
+  messages: Array<{ role: string; content: string }>;
+  citations?: Array<any>;
 }
 
 export function ChatMessages({ messages, citations }: ChatMessagesProps) {
@@ -34,17 +31,19 @@ export function ChatMessages({ messages, citations }: ChatMessagesProps) {
   }, [messages[messages.length - 1]?.content]);
 
   return (
-    <div className="flex flex-col gap-4 whitespace-normal break-words">
-      {messages.map((message, i) => (
+    <div className="space-y-4">
+      {messages.map((message, index) => (
         <div
-          key={message.id}
-          ref={i === messages.length - 1 ? lastMessageRef : undefined}
+          key={`${message.role}-${index}`}
+          className={`flex ${message.role === "user" ? "justify-end" : "justify-start"
+            }`}
         >
-          <ChatMessage
-            message={message}
-            i={i}
-            citations={message.role === "assistant" ? citations : undefined}
-          />
+          <div className={`max-w-[80%] rounded-lg p-4 ${message.role === "user"
+              ? "bg-orange-500 text-white"
+              : "bg-gray-800 text-gray-100"
+            }`}>
+            <div className="whitespace-pre-wrap">{message.content}</div>
+          </div>
         </div>
       ))}
     </div>
