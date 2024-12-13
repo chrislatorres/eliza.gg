@@ -1,7 +1,12 @@
 import { createTurso } from "@/libs/indexer/utils/create-turso";
 import { embed } from "@/libs/indexer/utils/embed";
 import { getCerebrasModel } from "@/libs/indexer/utils/models";
-import { createDataStreamResponse, generateObject, streamText } from "ai";
+import {
+  createDataStreamResponse,
+  generateObject,
+  smoothStream,
+  streamText,
+} from "ai";
 import { z } from "zod";
 
 const generateFollowUpPrompts = async (
@@ -9,11 +14,6 @@ const generateFollowUpPrompts = async (
   query: string,
   context: string
 ) => {
-  console.log({
-    model,
-    query,
-    context,
-  });
   const result = await generateObject({
     maxRetries: 3,
     model,
@@ -133,6 +133,7 @@ export async function POST(request: Request) {
 
       // Stream the main response with onFinish handler
       const responseStream = streamText({
+        experimental_transform: smoothStream(),
         model: getCerebrasModel("llama-3.3-70b"),
         system: `
           You are a helpful assistant called Eliza.gg and you assist community members with questions about the Eliza open source framework and the ElizaOS operating system.
