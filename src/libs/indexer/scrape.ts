@@ -81,6 +81,8 @@ const urls = [
   "https://ai16z.github.io/eliza/community/creator-fund/",
   // GitHub contributor profiles
   "https://ai16z.github.io/profiles/",
+  // CISA
+  "https://www.cisa.gov/news.xml",
 ];
 
 console.time("fetch-all");

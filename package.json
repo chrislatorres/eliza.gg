@@ -1,13 +1,13 @@
 {
   "name": "eliza",
   "version": "0.0.1",
+  "license": "UNLICENSED",
   "private": true,
   "scripts": {
     "dev": "bunx --bun next dev --turbo",
     "build": "next build"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^1.0.7",
     "@babel/runtime": "^7.26.0",
     "@codemirror/lang-css": "^6.3.1",
     "@codemirror/lang-html": "^6.4.9",
@@ -20,14 +20,22 @@
     "@codemirror/view": "^6.35.3",
     "@heroicons/react": "^2.2.0",
     "@libsql/client": "^0.14.0",
+    "@lit-protocol/auth-helpers": "^6.11.3",
+    "@lit-protocol/constants": "^6.11.3",
+    "@lit-protocol/lit-node-client": "^6.11.3",
+    "@nevermined-io/payments": "^0.8.0",
+    "@nevermined-io/sdk": "^3.0.45",
     "@openrouter/ai-sdk-provider": "^0.0.6",
+    "@story-protocol/core-sdk": "^1.2.0-rc.3",
     "@tailwindcss/postcss": "^4.0.0-beta.1",
     "@uiw/codemirror-theme-github": "4.21.19",
+    "agiverse": "^0.1.1",
     "ai": "^4.0.16",
     "clsx": "^2.1.1",
     "codemirror": "^6.0.1",
     "eslint-plugin-path-alias": "^2.1.0",
     "eslint-plugin-tailwindcss": "^3.17.5",
+    "ethers": "v5",
     "jotai": "^2.10.3",
     "lucide-react": "^0.468.0",
     "markdown-to-jsx": "^7.7.1",
@@ -38,6 +46,7 @@
     "react-dom": "^19.0.0",
     "react-intersection-observer": "^9.13.1",
     "sonner": "^1.7.1",
+    "viem": "^2.21.55",
     "voyageai": "^0.0.3-1"
   },
   "devDependencies": {
