@@ -122,7 +122,7 @@ export async function POST(request: Request) {
 
       // Start generating follow-up prompts in parallel
       const followUpPromptPromise = generateFollowUpPrompts(
-        getCerebrasModel("llama-3.3-70b"),
+        getCerebrasModel("llama3.1-70b"),
         query,
         formattedResults
       );
@@ -130,7 +130,7 @@ export async function POST(request: Request) {
       // Stream the main response with onFinish handler
       const responseStream = streamText({
         experimental_transform: smoothStream(),
-        model: getCerebrasModel("llama-3.3-70b"),
+        model: getCerebrasModel("llama3.1-70b"),
         system: `
           You are a helpful assistant called Eliza.gg and you assist community members with questions about the Eliza open source framework and the ElizaOS operating system.
 
