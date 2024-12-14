@@ -18,11 +18,6 @@ export function getOpenRouterModel(model: string) {
       "HTTP-Referer": process.env.OPENROUTER_REFERRER,
       "X-Title": process.env.OPENROUTER_TITLE,
     },
-    extraBody: {
-      provider: {
-        order: ["Together"],
-      },
-    },
   });
   return openrouter(model);
 }

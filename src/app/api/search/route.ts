@@ -1,6 +1,6 @@
 import { createTurso } from "@/libs/indexer/utils/create-turso";
 import { embed } from "@/libs/indexer/utils/embed";
-import { getTogetherModel } from "@/libs/indexer/utils/models";
+import { getOpenRouterModel } from "@/libs/indexer/utils/models";
 import {
   createDataStreamResponse,
   generateObject,
@@ -10,7 +10,7 @@ import {
 } from "ai";
 import { z } from "zod";
 
-const MODEL_NAME = "meta-llama/Llama-3.3-70B-Instruct-Turbo";
+const MODEL_NAME = "openai/gpt-4o-2024-11-20";
 
 const generateFollowUpPrompts = async (
   model: any,
@@ -135,7 +135,7 @@ export async function POST(request: Request) {
 
       // Start generating follow-up prompts in parallel
       const followUpPromptPromise = generateFollowUpPrompts(
-        getTogetherModel(MODEL_NAME),
+        getOpenRouterModel(MODEL_NAME),
         query,
         formattedResults
       );
@@ -143,7 +143,7 @@ export async function POST(request: Request) {
       // Stream the main response with onFinish handler
       const responseStream = streamText({
         experimental_transform: smoothStream(),
-        model: getTogetherModel(MODEL_NAME),
+        model: getOpenRouterModel(MODEL_NAME),
         system: `
           You are a helpful assistant called Eliza.gg and you assist community members with questions about the Eliza open source framework and the ElizaOS operating system.
 
