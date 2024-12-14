@@ -1,6 +1,6 @@
 import { createTurso } from "@/libs/indexer/utils/create-turso";
 import { embed } from "@/libs/indexer/utils/embed";
-import { getCerebrasModel } from "@/libs/indexer/utils/models";
+import { getTogetherModel } from "@/libs/indexer/utils/models";
 import {
   createDataStreamResponse,
   generateObject,
@@ -8,6 +8,8 @@ import {
   streamText,
 } from "ai";
 import { z } from "zod";
+
+const MODEL_NAME = "meta-llama/Llama-3.3-70B-Instruct-Turbo";
 
 const generateFollowUpPrompts = async (
   model: any,
@@ -44,8 +46,6 @@ Given the user's question and the context of the conversation, generate 3 natura
 The user query is: "${query}"
     `.trim(),
   });
-
-  console.log({ result });
 
   return result.object.followUpPrompts;
 };
@@ -122,7 +122,7 @@ export async function POST(request: Request) {
 
       // Start generating follow-up prompts in parallel
       const followUpPromptPromise = generateFollowUpPrompts(
-        getCerebrasModel("llama3.1-70b"),
+        getTogetherModel(MODEL_NAME),
         query,
         formattedResults
       );
@@ -130,7 +130,7 @@ export async function POST(request: Request) {
       // Stream the main response with onFinish handler
       const responseStream = streamText({
         experimental_transform: smoothStream(),
-        model: getCerebrasModel("llama3.1-70b"),
+        model: getTogetherModel(MODEL_NAME),
         system: `
           You are a helpful assistant called Eliza.gg and you assist community members with questions about the Eliza open source framework and the ElizaOS operating system.
 
