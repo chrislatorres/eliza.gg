@@ -4,6 +4,7 @@ import { getTogetherModel } from "@/libs/indexer/utils/models";
 import {
   createDataStreamResponse,
   generateObject,
+  NoObjectGeneratedError,
   smoothStream,
   streamText,
 } from "ai";
@@ -16,15 +17,16 @@ const generateFollowUpPrompts = async (
   query: string,
   context: string
 ) => {
-  const result = await generateObject({
-    maxRetries: 3,
-    model,
-    schema: z.object({
-      followUpPrompts: z
-        .array(z.string())
-        .describe("3 relevant follow-up questions related to the query"),
-    }),
-    system: `
+  try {
+    const result = await generateObject({
+      maxRetries: 3,
+      model,
+      schema: z.object({
+        followUpPrompts: z
+          .array(z.string())
+          .describe("3 relevant follow-up questions related to the query"),
+      }),
+      system: `
 You generate follow up prompts for a chatbot. The follow up prompts are from the perspective of the end user. This is basically like Google's "People also ask" section.
 
 <context>
@@ -42,12 +44,23 @@ You generate follow up prompts for a chatbot. The follow up prompts are from the
 
 Given the user's question and the context of the conversation, generate 3 natural follow-up questions from the perspective of the end user that would help explore the topic further. The questions should be specific and directly related to the topic.
     `.trim(),
-    prompt: `
+      prompt: `
 The user query is: "${query}"
     `.trim(),
-  });
+    });
 
-  return result.object.followUpPrompts;
+    return result.object.followUpPrompts;
+  } catch (error) {
+    if (NoObjectGeneratedError.isInstance(error)) {
+      console.log("NoObjectGeneratedError");
+      console.log("Cause:", error.cause);
+      console.log("Text:", error.text);
+      console.log("Response:", error.response);
+      console.log("Usage:", error.usage);
+    }
+
+    throw error;
+  }
 };
 
 export async function POST(request: Request) {
