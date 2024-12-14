@@ -1,5 +1,5 @@
 import { LandingTextarea } from "@/components/app/landing-textarea";
-import Link from "next/link";
+import { Footer } from "@/components/layout/footer";
 import { Suspense } from "react";
 
 export const experimental_ppr = true;
@@ -17,17 +17,7 @@ export default function Page() {
           </Suspense>
         </div>
       </div>
-      <p className="mt-auto text-center text-xs text-zinc-400 dark:text-zinc-600 mb-2">
-        By messaging, you agree to our{" "}
-        <Link href="/terms" className="underline" target="_blank">
-          Terms
-        </Link>{" "}
-        and{" "}
-        <Link href="/privacy" className="underline" target="_blank">
-          Privacy Policy
-        </Link>
-        .
-      </p>
+      <Footer />
     </main>
   );
 }

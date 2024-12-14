@@ -28,7 +28,6 @@ export function getOpenRouterModel(model: string) {
 }
 
 export function getTogetherModel(model: string) {
-  console.log("getTogetherModel", model, process.env.TOGETHER_API_KEY);
   const togetherai = createTogetherAI({
     apiKey: process.env.TOGETHER_API_KEY,
   });
