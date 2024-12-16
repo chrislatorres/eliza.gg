@@ -3,6 +3,7 @@ import "@/app/globals.css";
 import { ProgressBar } from "@/app/progress-bar";
 import { Toaster } from "@/app/toaster";
 import { Header } from "@/components/layout/header";
+import { Analytics } from "@vercel/analytics/react";
 import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "next-themes";
 
@@ -75,6 +76,7 @@ export default function RootLayout({
         </div>
         <ProgressBar />
         <Toaster />
+        <Analytics />
       </body>
     </html>
   );

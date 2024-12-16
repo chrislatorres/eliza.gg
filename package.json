@@ -35,6 +35,7 @@
     "@story-protocol/core-sdk": "^1.2.0-rc.3",
     "@tailwindcss/postcss": "^4.0.0-beta.1",
     "@uiw/codemirror-theme-github": "4.21.19",
+    "@vercel/analytics": "^1.4.1",
     "agiverse": "^0.1.1",
     "ai": "^4.0.18",
     "clsx": "^2.1.1",
