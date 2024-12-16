@@ -4,17 +4,7 @@ export function Footer() {
   return (
     <footer className="mt-16 px-2 py-2 md:px-4 w-full flex">
       <div className="mx-auto flex w-full justify-between items-center">
-        <div className="text-xs text-zinc-400 dark:text-zinc-600">
-          Powered by{" "}
-          <a
-            href="https://dub.sh/together-ai"
-            className="underline"
-            target="_blank"
-            rel="noopener"
-          >
-            TogetherAI
-          </a>
-        </div>
+        <div className="text-xs text-zinc-400 dark:text-zinc-600"></div>
 
         <p className="text-center text-xs text-zinc-400 dark:text-zinc-600">
           By messaging, you agree to our{" "}
