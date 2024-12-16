@@ -2,11 +2,10 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="mt-16 px-2 py-2 md:px-4 w-full flex">
-      <div className="mx-auto flex w-full justify-between items-center">
-        <div className="text-xs text-zinc-400 dark:text-zinc-600"></div>
-
-        <p className="text-center text-xs text-zinc-400 dark:text-zinc-600">
+    <footer className="mt-16 px-2 py-2 md:px-4 w-full">
+      <div className="mx-auto flex flex-col md:flex-row w-full items-center gap-2 md:gap-0">
+        <div className="hidden md:block flex-1" />
+        <p className="text-left md:text-center flex-1 text-xs text-zinc-400 dark:text-zinc-600">
           By messaging, you agree to our{" "}
           <Link href="/terms" className="underline" target="_blank">
             Terms
@@ -17,8 +16,7 @@ export function Footer() {
           </Link>
           .
         </p>
-
-        <div className="text-xs text-zinc-400 dark:text-zinc-600">
+        <div className="flex-1 text-center md:text-right text-xs text-zinc-400 dark:text-zinc-600">
           Created by{" "}
           <a
             href="https://x.com/chrislatorres"
