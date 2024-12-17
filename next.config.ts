@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === "production",
   },
   experimental: {
-    ppr: "incremental",
+    ppr: true,
     inlineCss: true,
   },
   devIndicators: {

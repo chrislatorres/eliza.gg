@@ -2,8 +2,6 @@ import { LandingTextarea } from "@/components/app/landing-textarea";
 import { Footer } from "@/components/layout/footer";
 import { Suspense } from "react";
 
-export const experimental_ppr = true;
-
 export default function Page() {
   return (
     <main className="flex-1 size-full overflow-hidden flex flex-col justify-center items-center">
