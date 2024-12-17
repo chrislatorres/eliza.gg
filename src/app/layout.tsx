@@ -1,6 +1,7 @@
 import { inter } from "@/app/fonts";
 import "@/app/globals.css";
 import { ProgressBar } from "@/app/progress-bar";
+import { Providers } from "@/app/providers";
 import { Toaster } from "@/app/toaster";
 import { Header } from "@/components/layout/header";
 import { Analytics } from "@vercel/analytics/react";
@@ -60,24 +61,26 @@ export default function RootLayout({
 }>) {
   return (
     <html suppressHydrationWarning lang="en" className={inter.className}>
-      <body className="min-h-dvh antialiased bg-white text-black scheme-light dark:bg-black dark:text-white dark:scheme-dark selection:!bg-[#fff0dd] dark:selection:!bg-[#3d2b15] overscroll-none">
-        <div className="flex min-h-dvh w-full flex-col grow">
-          <div className="flex grow flex-col size-full min-h-dvh">
-            <Header />
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {children}
-            </ThemeProvider>
+      <Providers>
+        <body className="min-h-dvh antialiased bg-white text-black scheme-light dark:bg-black dark:text-white dark:scheme-dark selection:!bg-[#fff0dd] dark:selection:!bg-[#3d2b15] overscroll-none">
+          <div className="flex min-h-dvh w-full flex-col grow">
+            <div className="flex grow flex-col size-full min-h-dvh">
+              <Header />
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              >
+                {children}
+              </ThemeProvider>
+            </div>
           </div>
-        </div>
-        <ProgressBar />
-        <Toaster />
-        <Analytics />
-      </body>
+          <ProgressBar />
+          <Toaster />
+          <Analytics />
+        </body>
+      </Providers>
     </html>
   );
 }
