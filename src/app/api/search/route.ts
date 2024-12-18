@@ -177,7 +177,7 @@ export async function POST(request: Request) {
           <citations-rules>
               - Always cite your sources.
               - When citing, respond with citation tag.
-              - When referencing information, cite the source using <reference index={1}>Get Started</reference>, <reference index={2}>Quickstart</reference>, etc. corresponding to the order of citations provided. The index is the index of the citation in the citations array, and the title is the short title of the citation.
+              - When referencing information, cite the source using <reference index={1}>Get Started</reference> (in this case the title of the cited source is "Get Started") corresponding to the order of citations provided. The index is the index of the citation in the citations array, and the title is the short title of the citation.
               - At the end of the response, do not list the references, you are only citing.
               - Do NOT tell the user to go/explore/refer to the documentation or references.
               - DO NOT say anything like "For more information, you can refer to the documentation." or "For more information on the available commands, you can check the Local Development Guide".
@@ -215,6 +215,11 @@ export async function POST(request: Request) {
                   <question>
                       How do I install ai16z?
                   </question>
+                  <example-sources>
+                    Title: Get Started
+                    URL Source: https://eliza.gg/docs/get-started
+                    Content: To install ai16z, you can use the Eliza framework. ...
+                  </example-sources>
                   <answer>
                       To install ai16z, you can use the Eliza framework. <reference index={1}>Get Started</reference>
 
