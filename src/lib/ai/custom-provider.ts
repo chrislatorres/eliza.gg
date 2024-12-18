@@ -12,8 +12,8 @@ initLogger({
 
 export const provider = customProvider({
   languageModels: {
-    "anthropic/claude-3.5-sonnet": wrapModel(
-      openrouter("anthropic/claude-3.5-sonnet")
+    "anthropic/claude-3.5-sonnet:beta": wrapModel(
+      openrouter("anthropic/claude-3.5-sonnet:beta")
     ),
   },
 });
