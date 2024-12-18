@@ -1,8 +1,17 @@
 "use client";
 
 import clsx from "clsx";
+import { TextareaHTMLAttributes } from "react";
 
-export const ResizableTextarea = ({ className, ...props }) => {
+interface ResizableTextareaProps
+  extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+  className?: string;
+}
+
+export const ResizableTextarea = ({
+  className,
+  ...props
+}: ResizableTextareaProps) => {
   return (
     <span
       data-slot="control"

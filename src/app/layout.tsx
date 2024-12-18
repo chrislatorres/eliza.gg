@@ -1,3 +1,4 @@
+import { siteConfig } from "@/app/constants";
 import { inter } from "@/app/fonts";
 import "@/app/globals.css";
 import { ProgressBar } from "@/app/progress-bar";
@@ -15,42 +16,26 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://eliza.gg"),
-  title: "Eliza.gg - Learn about the Eliza Agent Framework",
-  description:
-    "Eliza is a powerful multi-agent simulation framework designed to create, deploy, and manage autonomous AI agents.",
+  metadataBase: new URL(siteConfig.url),
+  title: `${siteConfig.name} - Learn about the Eliza Agent Framework`,
+  description: siteConfig.description,
   openGraph: {
-    siteName: "Eliza.gg",
+    siteName: siteConfig.name,
     title: "The Documentation for Eliza",
-    description:
-      "Eliza is a powerful multi-agent simulation framework designed to create, deploy, and manage autonomous AI agents.",
-    images: ["/api/og"],
+    description: siteConfig.description,
+    images: [siteConfig.ogImage],
     type: "website",
-    url: "https://eliza.gg",
+    url: siteConfig.url,
     locale: "en_US",
   },
-  icons: [
-    {
-      rel: "icon",
-      type: "image/png",
-      url: "/eliza-black.png",
-      media: "(prefers-color-scheme: light)",
-    },
-    {
-      rel: "icon",
-      type: "image/png",
-      url: "/eliza-white.png",
-      media: "(prefers-color-scheme: dark)",
-    },
-  ],
+  icons: siteConfig.icons,
   twitter: {
     card: "summary_large_image",
-    site: "Eliza.gg",
+    site: siteConfig.name,
     title: "The Documentation for Eliza",
-    description:
-      "Eliza is a powerful multi-agent simulation framework designed to create, deploy, and manage autonomous AI agents.",
-    images: ["/api/og"],
-    creator: "@chrislatorres",
+    description: siteConfig.description,
+    images: [siteConfig.ogImage],
+    creator: siteConfig.creator,
   },
 };
 

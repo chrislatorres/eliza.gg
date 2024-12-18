@@ -22,6 +22,8 @@
     "@codemirror/state": "^6.5.0",
     "@codemirror/view": "^6.35.3",
     "@coinbase/cdp-langchain": "^0.0.9",
+    "@fal-ai/client": "^1.2.1",
+    "@fal-ai/server-proxy": "^1.1.1",
     "@heroicons/react": "^2.2.0",
     "@langchain/langgraph": "^0.2.33",
     "@langchain/openai": "^0.3.14",
