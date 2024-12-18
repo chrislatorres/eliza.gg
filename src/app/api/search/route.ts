@@ -5,7 +5,6 @@ import {
   createDataStreamResponse,
   generateObject,
   NoObjectGeneratedError,
-  smoothStream,
   streamText,
 } from "ai";
 import { z } from "zod";
@@ -13,9 +12,6 @@ import { z } from "zod";
 const generateFollowUpPrompts = async (query: string, context: string) => {
   try {
     const result = await generateObject({
-      experimental_telemetry: {
-        isEnabled: true,
-      },
       maxRetries: 3,
       model: ELIZA_MODEL,
       schema: z.object({
@@ -138,10 +134,7 @@ export async function POST(request: Request) {
 
       // Stream the main response with onFinish handler
       const responseStream = streamText({
-        experimental_telemetry: {
-          isEnabled: true,
-        },
-        experimental_transform: smoothStream(),
+        // experimental_transform: smoothStream(),
         model: ELIZA_MODEL,
         system: `
           You are a helpful assistant called Eliza.gg and you assist community members with questions about the Eliza open source framework and the ElizaOS operating system.
@@ -178,6 +171,7 @@ export async function POST(request: Request) {
               - Always cite your sources.
               - When citing, respond with citation tag.
               - When referencing information, cite the source using <reference index={1}>Get Started</reference> (in this case the title of the cited source is "Get Started") corresponding to the order of citations provided. The index is the index of the citation in the citations array, and the title is the short title of the citation.
+              - The inside of the <reference> tag should be the title of the citation, and should be very short. Do NOT include sentences or any long text.
               - At the end of the response, do not list the references, you are only citing.
               - Do NOT tell the user to go/explore/refer to the documentation or references.
               - DO NOT say anything like "For more information, you can refer to the documentation." or "For more information on the available commands, you can check the Local Development Guide".

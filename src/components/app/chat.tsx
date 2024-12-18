@@ -20,7 +20,6 @@ export const Chat = () => {
     append,
   } = useChat({
     api: "/api/search",
-    experimental_throttle: 50,
     onError: (error) => {
       console.error("Chat error:", error);
     },
@@ -38,7 +37,7 @@ export const Chat = () => {
   const followUpPrompts = useMemo(() => {
     return (
       (data as unknown as ChatResponse[])?.reduce((acc, d, index) => {
-        acc[index - 1] = d.followUpPrompts || [];
+        acc[Math.floor(index / 2)] = d.followUpPrompts || [];
         return acc;
       }, {} as Record<number, string[]>) || {}
     );
@@ -100,17 +99,21 @@ export const Chat = () => {
   }, []);
 
   return (
-    <main className="flex flex-col size-full relative md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] mx-auto w-full px-4 md:px-0 min-h-dvh">
-      <div className="flex-1 pt-16 pb-4">
-        <ChatMessages
-          messages={messages}
-          citationsMap={citations}
-          followUpPromptsMap={followUpPrompts}
-          onFollowUpClick={handleFollowUpClick}
-        />
+    <main className="flex flex-col min-h-dvh">
+      <div className="flex-1 relative md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] mx-auto w-full px-4 md:px-0">
+        <div className="pt-16 pb-40">
+          <ChatMessages
+            messages={messages}
+            citationsMap={citations}
+            followUpPromptsMap={followUpPrompts}
+            onFollowUpClick={handleFollowUpClick}
+          />
+        </div>
       </div>
-      <div className="sticky w-full md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] mx-auto left-0 right-0 bottom-0 pb-4  bg-white dark:bg-black rounded-t-lg">
-        <TextareaWithActions {...textareaProps} />
+      <div className="fixed inset-x-0 bottom-0 bg-gradient-to-t from-white dark:from-black from-50% to-transparent pb-6 pt-8">
+        <div className="max-w-3xl mx-auto px-4 md:px-0">
+          <TextareaWithActions {...textareaProps} />
+        </div>
       </div>
     </main>
   );

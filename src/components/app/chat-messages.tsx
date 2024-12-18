@@ -18,55 +18,76 @@ export function ChatMessages({
   followUpPromptsMap,
   onFollowUpClick,
 }: ChatMessagesProps) {
-  console.log({ messages, citationsMap, followUpPromptsMap });
-  const lastMessageRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const lastMessageRef = useRef<string>("");
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
-  // Calculate assistantIndex for each message
-  const getAssistantIndex = (messages: Message[], currentIndex: number) => {
-    // For each assistant message, we want to return its position * 2
-    return (
-      (messages.slice(0, currentIndex + 1).filter((m) => m.role === "assistant")
-        .length -
-        1) *
-      2
-    );
+  const scrollToBottom = (behavior: ScrollBehavior = "instant") => {
+    // Clear any pending scroll
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+
+    // Schedule the scroll with a small delay to ensure content is rendered
+    scrollTimeoutRef.current = setTimeout(() => {
+      const scrollTarget =
+        document.documentElement.scrollHeight - window.innerHeight;
+      // Add extra padding to ensure content is above the textarea (increased from 200 to 400)
+      window.scrollTo({
+        top: document.documentElement.scrollHeight + 400,
+        behavior,
+      });
+    }, 100);
   };
 
+  // Scroll to bottom when new messages are added
   useEffect(() => {
-    window.scrollTo({
-      top: document.documentElement.scrollHeight * 2,
-      behavior: "instant",
-    });
+    if (messages.length === 0) return;
+
+    const lastMessage = messages[messages.length - 1];
+    const isNewMessage = lastMessage.content !== lastMessageRef.current;
+
+    if (isNewMessage) {
+      lastMessageRef.current = lastMessage.content;
+      scrollToBottom("instant");
+    }
   }, [messages]);
 
-  // Also scroll when the last message content changes (streaming)
+  // Scroll while assistant is streaming
   useEffect(() => {
     if (!messages.length) return;
 
     const lastMessage = messages[messages.length - 1];
     if (lastMessage.role === "assistant") {
-      window.scrollTo({
-        top: document.documentElement.scrollHeight * 2,
-        behavior: "instant",
-      });
+      const isAtBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 100;
+
+      if (isAtBottom) {
+        scrollToBottom();
+      }
     }
   }, [messages[messages.length - 1]?.content]);
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <div className="flex flex-col gap-4 whitespace-normal break-words">
+    <div className="flex flex-col gap-4">
       {messages.map((message, i) => {
         const assistantIndex =
-          message.role === "assistant" ? getAssistantIndex(messages, i) : -1;
-
-        const followUpPrompts =
-          message.role === "assistant"
-            ? followUpPromptsMap[assistantIndex]
-            : undefined;
+          message.role === "assistant" ? Math.floor(i / 2) : -1;
 
         return (
           <div
             key={message.id}
-            ref={i === messages.length - 1 ? lastMessageRef : undefined}
+            ref={i === messages.length - 1 ? messagesEndRef : undefined}
           >
             <ChatMessage
               message={message}
@@ -76,7 +97,11 @@ export function ChatMessages({
                   ? citationsMap[assistantIndex]
                   : undefined
               }
-              followUpPrompts={followUpPrompts}
+              followUpPrompts={
+                message.role === "assistant"
+                  ? followUpPromptsMap[assistantIndex]
+                  : undefined
+              }
               onFollowUpClick={onFollowUpClick}
             />
           </div>

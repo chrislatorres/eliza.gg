@@ -1,7 +1,8 @@
-import { wrapModel } from "@/lib/ai/logging-middleware";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { experimental_customProvider as customProvider } from "ai";
 import { initLogger } from "braintrust";
+
+export const ELIZA_MODEL_NAME = "anthropic/claude-3.5-sonnet:beta";
 
 const openrouter = createOpenRouter();
 
@@ -12,8 +13,6 @@ initLogger({
 
 export const provider = customProvider({
   languageModels: {
-    "anthropic/claude-3.5-sonnet:beta": wrapModel(
-      openrouter("anthropic/claude-3.5-sonnet:beta")
-    ),
+    [ELIZA_MODEL_NAME]: openrouter(ELIZA_MODEL_NAME),
   },
 });
