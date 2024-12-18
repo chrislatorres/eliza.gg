@@ -1,6 +1,6 @@
-import { createTurso } from "@/libs/indexer/utils/create-turso";
-import { embed } from "@/libs/indexer/utils/embed";
-import { getCerebrasModel } from "@/libs/indexer/utils/models";
+import { createTurso } from "@/lib/indexer/utils/create-turso";
+import { embed } from "@/lib/indexer/utils/embed";
+import { getCerebrasModel } from "@/lib/indexer/utils/models";
 import { z } from "zod";
 
 interface Agent {

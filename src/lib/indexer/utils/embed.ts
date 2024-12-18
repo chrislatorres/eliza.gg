@@ -1,5 +1,5 @@
-import { createTurso } from "@/libs/indexer/utils/create-turso";
-import { hashString } from "@/libs/indexer/utils/hash";
+import { createTurso } from "@/lib/indexer/utils/create-turso";
+import { hashString } from "@/lib/indexer/utils/hash";
 import { VoyageAIClient } from "voyageai";
 
 const client = new VoyageAIClient({ apiKey: process.env.VOYAGE_API_KEY });

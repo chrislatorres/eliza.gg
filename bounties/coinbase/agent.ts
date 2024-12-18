@@ -1,5 +1,5 @@
-import { createTurso } from "@/libs/indexer/utils/create-turso";
-import { embed } from "@/libs/indexer/utils/embed";
+import { createTurso } from "@/lib/indexer/utils/create-turso";
+import { embed } from "@/lib/indexer/utils/embed";
 import { CdpAgentkit } from "@coinbase/cdp-agentkit-core";
 import { CdpToolkit } from "@coinbase/cdp-langchain";
 import { HumanMessage } from "@langchain/core/messages";

@@ -1,6 +1,8 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { createTogetherAI } from "@ai-sdk/togetherai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import { initLogger, wrapAISDKModel } from "braintrust";
+import { openai } from "@ai-sdk/openai";
 
 export function getCerebrasModel(model: string) {
   const openai = createOpenAI({
@@ -29,3 +31,29 @@ export function getTogetherModel(model: string) {
 
   return togetherai(model);
 }
+
+const logger = initLogger({
+  projectName: "eliza.gg",
+  apiKey: process.env.BRAINTRUST_API_KEY,
+});
+
+const model = wrapAISDKModel(openai.chat("gpt-3.5-turbo"));
+
+async function main() {
+  // This will automatically log the request, response, and metrics to Braintrust
+  const response = await model.doGenerate({
+    inputFormat: "messages",
+    mode: {
+      type: "regular",
+    },
+    prompt: [
+      {
+        role: "user",
+        content: [{ type: "text", text: "What is the capital of France?" }],
+      },
+    ],
+  });
+  console.log(response);
+}
+
+main();

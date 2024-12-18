@@ -1,6 +1,6 @@
-import { createTurso } from "@/libs/indexer/utils/create-turso";
-import { embed } from "@/libs/indexer/utils/embed";
-import { getOpenRouterModel } from "@/libs/indexer/utils/models";
+import { ELIZA_MODEL } from "@/lib/ai/models";
+import { createTurso } from "@/lib/indexer/utils/create-turso";
+import { embed } from "@/lib/indexer/utils/embed";
 import {
   createDataStreamResponse,
   generateObject,
@@ -10,17 +10,14 @@ import {
 } from "ai";
 import { z } from "zod";
 
-const MODEL_NAME = "openai/gpt-4o-2024-11-20";
-
-const generateFollowUpPrompts = async (
-  model: any,
-  query: string,
-  context: string
-) => {
+const generateFollowUpPrompts = async (query: string, context: string) => {
   try {
     const result = await generateObject({
+      experimental_telemetry: {
+        isEnabled: true,
+      },
       maxRetries: 3,
-      model,
+      model: ELIZA_MODEL,
       schema: z.object({
         followUpPrompts: z
           .array(z.string())
@@ -135,15 +132,17 @@ export async function POST(request: Request) {
 
       // Start generating follow-up prompts in parallel
       const followUpPromptPromise = generateFollowUpPrompts(
-        getOpenRouterModel(MODEL_NAME),
         query,
         formattedResults
       );
 
       // Stream the main response with onFinish handler
       const responseStream = streamText({
+        experimental_telemetry: {
+          isEnabled: true,
+        },
         experimental_transform: smoothStream(),
-        model: getOpenRouterModel(MODEL_NAME),
+        model: ELIZA_MODEL,
         system: `
           You are a helpful assistant called Eliza.gg and you assist community members with questions about the Eliza open source framework and the ElizaOS operating system.
 

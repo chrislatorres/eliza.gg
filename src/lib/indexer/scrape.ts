@@ -1,7 +1,7 @@
-import { chunkMarkdown } from "@/libs/indexer/utils/chunk-markdown";
-import { createTurso } from "@/libs/indexer/utils/create-turso";
-import { embedBatch } from "@/libs/indexer/utils/embed";
-import { hashString } from "@/libs/indexer/utils/hash";
+import { chunkMarkdown } from "@/lib/indexer/utils/chunk-markdown";
+import { createTurso } from "@/lib/indexer/utils/create-turso";
+import { embedBatch } from "@/lib/indexer/utils/embed";
+import { hashString } from "@/lib/indexer/utils/hash";
 
 const turso = createTurso();
 
