@@ -2,7 +2,7 @@ import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { experimental_customProvider as customProvider } from "ai";
 import { initLogger } from "braintrust";
 
-export const ELIZA_MODEL_NAME = "anthropic/claude-3.5-sonnet:beta";
+export const ELIZA_MODEL_NAME = "openai/gpt-4o-2024-11-20";
 
 const openrouter = createOpenRouter();
 

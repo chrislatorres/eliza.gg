@@ -5,8 +5,110 @@ import { hashString } from "@/lib/indexer/utils/hash";
 
 const turso = createTurso();
 
-console.time("total-execution");
+// Add these near the top of the file
+function log(message: string, data?: any) {
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] ${message}`, data ? data : "");
+}
 
+function logError(message: string, error: any) {
+  const timestamp = new Date().toISOString();
+  console.error(`[${timestamp}] ERROR: ${message}`, error);
+}
+
+// Add retry logic for database operations
+async function retryOperation<T>(
+  operation: () => Promise<T>,
+  maxRetries = 3,
+  delay = 1000
+): Promise<T> {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await operation();
+    } catch (error) {
+      if (i === maxRetries - 1) throw error;
+
+      logError(
+        `Operation failed, attempt ${
+          i + 1
+        }/${maxRetries}. Retrying in ${delay}ms...`,
+        error
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      // Exponential backoff
+      delay *= 2;
+    }
+  }
+  throw new Error("Should never reach here");
+}
+
+// Update the GitHub functions with better logging
+async function fetchGitHubContent(
+  path: string
+): Promise<Array<{ name: string; path: string; type: string }>> {
+  log(`Fetching GitHub contents for path: ${path}`);
+  const response = await fetch(
+    `https://api.github.com/repos/ai16z/eliza/contents/${path}`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+        Accept: "application/vnd.github.v3+json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    const error = `GitHub API error: ${response.statusText} for path ${path}`;
+    log(`ERROR: ${error}`);
+    throw new Error(error);
+  }
+
+  const contents = await response.json();
+  log(`Found ${contents.length} items in ${path}`);
+  return contents;
+}
+
+async function getMarkdownFiles(path: string): Promise<string[]> {
+  log(`Scanning directory: ${path}`);
+  const contents = await fetchGitHubContent(path);
+  let markdownFiles: string[] = [];
+
+  for (const item of contents) {
+    if (item.type === "file" && item.name.endsWith(".md")) {
+      log(`Found markdown file: ${item.path}`);
+      markdownFiles.push(item.path);
+    } else if (item.type === "dir") {
+      log(`Found subdirectory: ${item.path}, scanning...`);
+      const subFiles = await getMarkdownFiles(item.path);
+      markdownFiles = [...markdownFiles, ...subFiles];
+    }
+  }
+
+  log(`Total markdown files found in ${path}: ${markdownFiles.length}`);
+  return markdownFiles;
+}
+
+async function fetchMarkdownContent(path: string) {
+  log(`Fetching content for: ${path}`);
+  const response = await fetch(
+    `https://raw.githubusercontent.com/ai16z/eliza/main/${path}`
+  );
+
+  if (!response.ok) {
+    const error = `Failed to fetch markdown content: ${response.statusText} for ${path}`;
+    log(`ERROR: ${error}`);
+    throw new Error(error);
+  }
+
+  const content = await response.text();
+  log(`Successfully fetched content for ${path} (${content.length} bytes)`);
+  return content;
+}
+
+console.time("total-execution");
+log("Starting indexing process");
+
+log("Setting up database");
 console.time("db-setup");
 // drop tables
 await turso.execute(`DROP TABLE IF EXISTS embedding_cache`);
@@ -32,120 +134,116 @@ CREATE TABLE IF NOT EXISTS docs (
 `
 );
 console.timeEnd("db-setup");
+log("Database setup complete");
 
-const urls = [
-  // Core docs
-  "https://ai16z.github.io/eliza/docs/intro/",
-  "https://ai16z.github.io/eliza/docs/quickstart/",
-  "https://ai16z.github.io/eliza/docs/faq/",
-  "https://ai16z.github.io/eliza/docs/core/characterfile/",
-  "https://ai16z.github.io/eliza/docs/core/agents/",
-  "https://ai16z.github.io/eliza/docs/core/providers/",
-  "https://ai16z.github.io/eliza/docs/core/actions/",
-  "https://ai16z.github.io/eliza/docs/core/evaluators/",
-  "https://ai16z.github.io/eliza/docs/guides/configuration/",
-  "https://ai16z.github.io/eliza/docs/guides/advanced/",
-  "https://ai16z.github.io/eliza/docs/guides/secrets-management/",
-  "https://ai16z.github.io/eliza/docs/guides/local-development/",
-  "https://ai16z.github.io/eliza/docs/advanced/fine-tuning/",
-  "https://ai16z.github.io/eliza/docs/advanced/infrastructure/",
-  "https://ai16z.github.io/eliza/docs/advanced/trust-engine/",
-  "https://ai16z.github.io/eliza/docs/advanced/autonomous-trading/",
-  "https://ai16z.github.io/eliza/docs/packages/",
-  "https://ai16z.github.io/eliza/docs/packages/core/",
-  "https://ai16z.github.io/eliza/docs/packages/adapters/",
-  "https://ai16z.github.io/eliza/docs/packages/clients/",
-  "https://ai16z.github.io/eliza/docs/packages/agent/",
-  "https://ai16z.github.io/eliza/docs/packages/plugins/",
-  // Streams
-  "https://ai16z.github.io/eliza/community/Streams/10-2024/2024-10-25/",
-  "https://ai16z.github.io/eliza/community/Streams/10-2024/2024-10-27/",
-  "https://ai16z.github.io/eliza/community/Streams/10-2024/2024-10-29/",
-  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-08/",
-  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-06/",
-  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-10/",
-  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-15/",
-  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-22/",
-  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-26/",
-  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-21/",
-  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-24/",
-  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-28/",
-  "https://ai16z.github.io/eliza/community/Streams/11-2024/2024-11-29/",
-  "https://ai16z.github.io/eliza/community/Streams/12-2024/2024-12-03/",
-  "https://ai16z.github.io/eliza/community/Streams/12-2024/2024-12-05/",
-  "https://ai16z.github.io/eliza/community/Streams/12-2024/2024-12-06/",
-  "https://ai16z.github.io/eliza/community/Streams/12-2024/2024-12-01/",
-  // Community
-  "https://ai16z.github.io/eliza/community/",
-  // Creator fund
-  "https://ai16z.github.io/eliza/community/creator-fund/",
-  // GitHub contributor profiles
-  "https://ai16z.github.io/profiles/",
-  // CISA
-  "https://www.cisa.gov/news.xml",
-];
+log("Starting GitHub content fetch");
+console.time("fetch-paths");
+const directoriesToScan = ["docs/api", "docs/community", "docs/docs"];
+log(`Scanning directories: ${directoriesToScan.join(", ")}`);
 
+const markdownPaths = (
+  await Promise.all(directoriesToScan.map((dir) => getMarkdownFiles(dir)))
+).flat();
+console.timeEnd("fetch-paths");
+log(`Found ${markdownPaths.length} total markdown files to process`);
+
+log("Fetching markdown contents");
 console.time("fetch-all");
 const markdownContents = await Promise.all(
-  urls.map(async (url) => {
-    console.time(`fetch-${url}`);
-    const response = await fetch(`https://r.jina.ai/${url}`);
-    console.timeEnd(`fetch-${url}`);
-    console.time(`text-${url}`);
-    const text = await response.text();
-    console.timeEnd(`text-${url}`);
-
-    // Extract title and URL from first two lines
-    const lines = text.split("\n");
+  markdownPaths.map(async (path) => {
+    const content = await fetchMarkdownContent(path);
     const metadata = {
-      title: lines[0].replace(/^Title:\s*/, "").trim(),
-      url: url,
+      title: path.split("/").pop()?.replace(".md", "") || path,
+      url: `https://github.com/ai16z/eliza/blob/main/${path}`,
     };
-
-    return { content: text, metadata };
+    log(`Processed ${path} -> ${metadata.title}`);
+    return { content, metadata };
   })
 );
 console.timeEnd("fetch-all");
+log(`Successfully fetched all ${markdownContents.length} documents`);
 
+log("Chunking markdown content");
 console.time("chunk-all");
 const markdownContentChunks = markdownContents
   .map(({ content, metadata }) => {
-    console.time(`chunk-${content.slice(0, 10)}`);
     const chunks = chunkMarkdown(content, metadata);
-    console.timeEnd(`chunk-${content.slice(0, 10)}`);
+    log(`Created ${chunks.length} chunks for ${metadata.title}`);
     return chunks;
   })
   .flat();
 console.timeEnd("chunk-all");
+log(`Created total of ${markdownContentChunks.length} chunks`);
 
+log("Generating embeddings");
 console.time("embeddings-all");
 const embeddings = await embedBatch(
   markdownContentChunks.map((chunk) => chunk.content)
 );
 console.timeEnd("embeddings-all");
+log(`Generated ${embeddings.length} embeddings`);
 
+log("Inserting into database");
 console.time("db-insert");
-// Create batch of insert operations
-const insertOperations = markdownContentChunks.map((chunk, i) => ({
-  sql: `
-    INSERT OR IGNORE INTO docs (hash, title, url, content, full_emb)
-    VALUES (?, ?, ?, ?, vector32(?))
-  `,
-  args: [
-    hashString(chunk.content),
-    chunk.metadata.title,
-    chunk.metadata.url,
-    chunk.content,
-    `[${embeddings[i].join(", ")}]`,
-  ],
-}));
 
-// Execute all insertions in a single transaction
-await turso.batch(insertOperations, "write");
+// Split into smaller batches to avoid overwhelming the database
+const BATCH_SIZE = 100;
+let successCount = 0;
+let failureCount = 0;
+
+for (let i = 0; i < markdownContentChunks.length; i += BATCH_SIZE) {
+  const batch = markdownContentChunks.slice(i, i + BATCH_SIZE);
+  const batchOperations = batch.map((chunk, j) => ({
+    sql: `
+      INSERT OR IGNORE INTO docs (hash, title, url, content, full_emb)
+      VALUES (?, ?, ?, ?, vector32(?))
+    `,
+    args: [
+      hashString(chunk.content),
+      chunk.metadata.title,
+      chunk.metadata.url,
+      chunk.content,
+      `[${embeddings[i + j].join(", ")}]`,
+    ],
+  }));
+
+  try {
+    log(
+      `Processing batch ${i / BATCH_SIZE + 1}/${Math.ceil(
+        markdownContentChunks.length / BATCH_SIZE
+      )}`
+    );
+    await retryOperation(async () => {
+      await turso.batch(batchOperations, "write");
+    });
+    successCount += batch.length;
+    log(`Successfully inserted batch of ${batch.length} documents`);
+  } catch (error) {
+    logError(`Failed to insert batch starting at index ${i}`, error);
+    failureCount += batch.length;
+
+    // Try inserting one by one for failed batches
+    log("Attempting individual insertions for failed batch");
+    for (const [j, operation] of batchOperations.entries()) {
+      try {
+        await retryOperation(async () => {
+          await turso.execute(operation);
+        });
+        successCount++;
+        failureCount--;
+        log(`Successfully inserted individual document ${i + j}`);
+      } catch (error) {
+        logError(`Failed to insert individual document ${i + j}`, error);
+      }
+    }
+  }
+}
+
 console.timeEnd("db-insert");
+log(`Insertion complete. Success: ${successCount}, Failures: ${failureCount}`);
 
-console.log(
-  `Inserted ${markdownContentChunks.length} documents into the database`
+log(
+  `Successfully inserted ${markdownContentChunks.length} documents into the database`
 );
-
 console.timeEnd("total-execution");
+log("Indexing process complete");

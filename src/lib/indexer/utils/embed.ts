@@ -1,5 +1,9 @@
-import { createTurso } from "@/lib/indexer/utils/create-turso";
+import {
+  createTurso,
+  executeTursoQuery,
+} from "@/lib/indexer/utils/create-turso";
 import { hashString } from "@/lib/indexer/utils/hash";
+import { log, logError } from "@/lib/indexer/utils/logging";
 import { VoyageAIClient } from "voyageai";
 
 const client = new VoyageAIClient({ apiKey: process.env.VOYAGE_API_KEY });
@@ -68,15 +72,22 @@ export async function embedBatch(texts: string[]) {
   console.time("embedBatch-cache-check");
   for (const text of texts) {
     const hash = hashString(text);
-    const cachedResult = await turso.execute({
-      sql: "SELECT embedding FROM embedding_cache WHERE hash = ?",
-      args: [hash],
-    });
+    try {
+      const cachedResult = await executeTursoQuery(async () =>
+        turso.execute({
+          sql: "SELECT embedding FROM embedding_cache WHERE hash = ?",
+          args: [hash],
+        })
+      );
 
-    if (cachedResult.rows.length === 0) {
-      nonCached.push(text);
-    } else {
-      cached.push(cachedResult.rows[0][0]);
+      if (cachedResult.rows.length === 0) {
+        nonCached.push(text);
+      } else {
+        cached.push(cachedResult.rows[0][0]);
+      }
+    } catch (error) {
+      logError(`Cache check failed for text: ${text.slice(0, 50)}...`, error);
+      nonCached.push(text); // Treat as non-cached on error
     }
   }
   console.timeEnd("embedBatch-cache-check");
@@ -98,17 +109,43 @@ export async function embedBatch(texts: string[]) {
 
   // Store new embeddings in cache asynchronously
   console.time("embedBatch-cache-store");
-  nonCached.forEach((text, i) => {
-    const hash = hashString(text);
-    turso
-      .execute({
-        sql: "INSERT OR IGNORE INTO embedding_cache (hash, text, embedding) VALUES (?, ?, ?)",
-        args: [hash, text, JSON.stringify(allEmbeddings[i])],
+  let cacheSuccesses = 0;
+  let cacheFailures = 0;
+
+  // Process in smaller batches to avoid overwhelming the connection
+  const CACHE_BATCH_SIZE = 50;
+  for (let i = 0; i < nonCached.length; i += CACHE_BATCH_SIZE) {
+    const batch = nonCached.slice(i, i + CACHE_BATCH_SIZE);
+    await Promise.all(
+      batch.map(async (text, j) => {
+        const hash = hashString(text);
+        try {
+          await executeTursoQuery(async () =>
+            turso.execute({
+              sql: "INSERT OR IGNORE INTO embedding_cache (hash, text, embedding) VALUES (?, ?, ?)",
+              args: [hash, text, JSON.stringify(allEmbeddings[i + j])],
+            })
+          );
+          cacheSuccesses++;
+        } catch (error) {
+          cacheFailures++;
+          logError(
+            `Failed to cache embedding for text: ${text.slice(0, 50)}...`,
+            error
+          );
+        }
       })
-      .catch((err) => {
-        console.error("Failed to cache embedding:", err);
-      });
-  });
+    );
+
+    // Add a small delay between batches
+    if (i + CACHE_BATCH_SIZE < nonCached.length) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+  }
+
+  log(
+    `Cache storage complete. Successes: ${cacheSuccesses}, Failures: ${cacheFailures}`
+  );
   console.timeEnd("embedBatch-cache-store");
 
   console.timeEnd("embedBatch-total");

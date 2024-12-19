@@ -1,10 +1,10 @@
 import { Citation } from "@/types/chat";
-import { ArrowRightIcon } from "@heroicons/react/24/outline";
+import { ArrowRightIcon, LinkIcon } from "@heroicons/react/24/outline";
 import { Message } from "ai";
 import clsx from "clsx";
 import { memo } from "react";
-import { MemoizedMarkdown } from "./memoized-markdown";
 import { CodeBlock } from "./code-block";
+import { MemoizedMarkdown } from "./memoized-markdown";
 
 interface ChatMessageProps {
   message: Message;
@@ -64,6 +64,44 @@ export const ChatMessage = memo(function ChatMessage({
           : ""
       )}
     >
+      {message.role === "assistant" && citations && citations.length > 0 && (
+        <div className="mb-4 text-sm">
+          <div className="flex flex-wrap gap-2 text-zinc-500">
+            <span className="font-medium">Sources:</span>
+            {citations.map((citation, index) => (
+              <a
+                key={index}
+                href={citation.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-1.5 max-w-sm"
+              >
+                <LinkIcon className="w-3.5 h-3.5 flex-shrink-0 text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300" />
+                <div className="flex-1 truncate">
+                  <MemoizedMarkdown
+                    id={`citation-${message.id}-${index}`}
+                    content={citation.title}
+                    options={{
+                      wrapper: "span",
+                      forceInline: true,
+                      overrides: {
+                        p: {
+                          component: "span",
+                          props: {
+                            className:
+                              "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 truncate",
+                          },
+                        },
+                      },
+                    }}
+                  />
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div
         className={clsx(
           "prose prose-zinc dark:prose-invert !max-w-full",
