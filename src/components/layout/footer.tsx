@@ -16,17 +16,7 @@ export function Footer() {
           </Link>
           .
         </p>
-        <div className="flex-1 text-center md:text-right text-xs text-zinc-400 dark:text-zinc-600">
-          Created by{" "}
-          <a
-            href="https://x.com/chrislatorres"
-            className="underline"
-            target="_blank"
-            rel="noopener"
-          >
-            @chrislatorres
-          </a>
-        </div>
+        <div className="flex-1" />
       </div>
     </footer>
   );

@@ -11,11 +11,13 @@ const ChatForm = memo(function ChatForm({
   onInputChange,
   onSubmit,
   isLoading,
+  placeholder,
 }: {
   input: string;
   onInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
   isLoading: boolean;
+  placeholder?: string;
 }) {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -35,7 +37,7 @@ const ChatForm = memo(function ChatForm({
           aria-label="Prompt"
           value={input}
           onChange={onInputChange}
-          placeholder="Ask a follow up..."
+          placeholder={placeholder || "Ask a follow up..."}
           className={clsx([
             "size-full bg-transparent",
             "relative block size-full appearance-none",
@@ -78,11 +80,13 @@ export const TextareaWithActions = memo(function TextareaWithActions({
   onInputChange,
   onSubmit,
   isLoading,
+  placeholder,
 }: {
   input: string;
   onInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
   isLoading: boolean;
+  placeholder?: string;
 }) {
   return (
     <div className="flex flex-col w-full">
@@ -113,6 +117,7 @@ export const TextareaWithActions = memo(function TextareaWithActions({
             onInputChange={onInputChange}
             onSubmit={onSubmit}
             isLoading={isLoading}
+            placeholder={placeholder}
           />
         </div>
       </span>
