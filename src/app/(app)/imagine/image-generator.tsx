@@ -93,14 +93,12 @@ export function ImageGenerator() {
       <div className="flex-1 relative mx-auto w-full">
         <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
           {/* Image Display Area */}
-          <div className="w-full max-w-[1024px] px-4">
+          <div className="w-full max-w-[min(90vh,800px)] px-4">
             <div className="aspect-square w-full rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center">
               {imageUrl ? (
                 <img
                   src={imageUrl}
                   alt="Generated image"
-                  width={1024}
-                  height={1024}
                   className="w-full h-full object-cover"
                 />
               ) : (
