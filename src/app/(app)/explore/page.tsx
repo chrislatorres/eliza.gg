@@ -67,22 +67,24 @@ export default function Page() {
           <div
             key={category.title}
             className={clsx([
-              "p-6 rounded-lg",
+              "p-5 rounded-lg",
               "border border-zinc-200 dark:border-zinc-800",
               "bg-white dark:bg-zinc-900",
             ])}
           >
-            <h2 className="text-xl font-semibold mb-2">{category.title}</h2>
-            <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-4">
-              {category.description}
-            </p>
+            <div className="border-b border-zinc-200 dark:border-zinc-800 pb-4 mb-2">
+              <h2 className="text-xl font-semibold mb-2">{category.title}</h2>
+              <p className="text-zinc-600 dark:text-zinc-400 text-sm">
+                {category.description}
+              </p>
+            </div>
             <div className="space-y-2">
               {category.prompts.map((prompt) => (
                 <button
                   key={prompt}
                   onClick={() => handlePromptSelect(prompt)}
                   className={clsx([
-                    "w-full text-left px-4 py-2 rounded-lg cursor-pointer",
+                    "w-full text-left py-2 rounded-lg cursor-pointer",
                     "text-sm",
                     "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white",
                     "transition-colors",

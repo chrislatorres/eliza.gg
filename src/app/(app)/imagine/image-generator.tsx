@@ -24,6 +24,10 @@ export function ImageGenerator() {
         return;
       }
 
+      toast.message("Generating your image...", {
+        description: promptToUse,
+      });
+
       setIsGenerating(true);
       try {
         const result = await fal.subscribe("fal-ai/flux-lora", {
