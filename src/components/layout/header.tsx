@@ -1,4 +1,5 @@
 import { Logo } from "@/components/ui/logo";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import Link from "next/link";
 
@@ -44,9 +45,11 @@ export function Header() {
               "text-zinc-500 hover:text-zinc-900",
               "dark:text-zinc-500 dark:hover:text-white",
               "transition-colors",
+              "flex items-center gap-1",
             ])}
           >
             ElizaOS
+            <ArrowTopRightOnSquareIcon className="h-3 w-3" />
           </a>
         </div>
 
