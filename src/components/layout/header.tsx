@@ -37,6 +37,21 @@ export function Header() {
             Imagine
           </Link>
           <a
+            href="https://ai16z.github.io/website/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={clsx([
+              "text-sm font-medium",
+              "text-zinc-500 hover:text-zinc-900",
+              "dark:text-zinc-500 dark:hover:text-white",
+              "transition-colors",
+              "flex items-center gap-1",
+            ])}
+          >
+            Bounties
+            <ArrowTopRightOnSquareIcon className="h-3 w-3" />
+          </a>
+          <a
             href="https://elizaos.ai"
             target="_blank"
             rel="noopener noreferrer"
