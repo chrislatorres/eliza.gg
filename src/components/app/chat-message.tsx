@@ -55,6 +55,15 @@ export const ChatMessage = memo(function ChatMessage({
     },
   };
 
+  // Deduplicate citations by URL
+  const uniqueCitations = citations?.reduce((acc, current) => {
+    const existingCitation = acc.find((c) => c.url === current.url);
+    if (!existingCitation) {
+      acc.push(current);
+    }
+    return acc;
+  }, [] as Citation[]);
+
   return (
     <div
       className={clsx(
@@ -64,43 +73,45 @@ export const ChatMessage = memo(function ChatMessage({
           : ""
       )}
     >
-      {message.role === "assistant" && citations && citations.length > 0 && (
-        <div className="mb-4 text-sm">
-          <div className="flex flex-wrap gap-2 text-zinc-500">
-            <span className="font-medium">Sources:</span>
-            {citations.map((citation, index) => (
-              <a
-                key={index}
-                href={citation.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-1.5 max-w-sm"
-              >
-                <LinkIcon className="w-3.5 h-3.5 flex-shrink-0 text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300" />
-                <div className="flex-1 truncate">
-                  <MemoizedMarkdown
-                    id={`citation-${message.id}-${index}`}
-                    content={citation.title}
-                    options={{
-                      wrapper: "span",
-                      forceInline: true,
-                      overrides: {
-                        p: {
-                          component: "span",
-                          props: {
-                            className:
-                              "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 truncate",
+      {message.role === "assistant" &&
+        uniqueCitations &&
+        uniqueCitations.length > 0 && (
+          <div className="mb-4 text-sm">
+            <div className="flex flex-wrap gap-2 text-zinc-500">
+              <span className="font-medium">Sources:</span>
+              {uniqueCitations.map((citation, index) => (
+                <a
+                  key={index}
+                  href={citation.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex items-center gap-1.5 max-w-sm"
+                >
+                  <LinkIcon className="w-3.5 h-3.5 flex-shrink-0 text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300" />
+                  <div className="flex-1 truncate">
+                    <MemoizedMarkdown
+                      id={`citation-${message.id}-${index}`}
+                      content={citation.title}
+                      options={{
+                        wrapper: "span",
+                        forceInline: true,
+                        overrides: {
+                          p: {
+                            component: "span",
+                            props: {
+                              className:
+                                "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 truncate",
+                            },
                           },
                         },
-                      },
-                    }}
-                  />
-                </div>
-              </a>
-            ))}
+                      }}
+                    />
+                  </div>
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       <div
         className={clsx(

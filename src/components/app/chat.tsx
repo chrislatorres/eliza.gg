@@ -19,7 +19,7 @@ export const Chat = () => {
     data,
     append,
   } = useChat({
-    api: "/api/search",
+    api: "/api/chat",
     onError: (error) => {
       console.error("Chat error:", error);
     },
