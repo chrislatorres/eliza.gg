@@ -24,6 +24,7 @@
     "@coinbase/cdp-langchain": "^0.0.9",
     "@fal-ai/client": "^1.2.1",
     "@fal-ai/server-proxy": "^1.1.1",
+    "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
     "@langchain/langgraph": "^0.2.33",
     "@langchain/openai": "^0.3.14",
