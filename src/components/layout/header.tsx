@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import {
@@ -113,7 +114,15 @@ export function Header() {
             </button>
           </div>
 
-          <div className="hidden md:flex md:flex-1 md:justify-end" />
+          <div className="hidden md:flex md:flex-1 md:justify-end">
+            <Button
+              color="orange"
+              href="https://jup.ag/swap/SOL-ai16z?referrer=243q1Q3mDezpdMm9TTJTo3CLvp5mJfRJ3bNzSFnLSbsh&feeBps=100"
+              target="_blank"
+            >
+              Buy $ai16z
+            </Button>
+          </div>
         </div>
       </nav>
 
