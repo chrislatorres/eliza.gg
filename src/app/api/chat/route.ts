@@ -82,7 +82,7 @@ export async function POST(request: Request) {
         vector_distance_cos(full_emb, vector32(?)) as similarity
       FROM docs
       ORDER BY similarity ASC
-      LIMIT 5
+      LIMIT 15
     `,
     args: [`[${queryEmbedding.join(", ")}]`],
   });

@@ -72,6 +72,36 @@ export function Header() {
         <ArrowTopRightOnSquareIcon className="h-3 w-3" />
       </a>
       <a
+        href="https://ai16z.github.io/eliza/docs/intro/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className={clsx(
+          "text-sm font-medium flex items-center gap-1",
+          mobile
+            ? "-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-zinc-900 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900"
+            : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+        )}
+        onClick={() => setMobileMenuOpen(false)}
+      >
+        Docs
+        <ArrowTopRightOnSquareIcon className="h-3 w-3" />
+      </a>
+      <a
+        href="https://elizaos.ai/blog"
+        target="_blank"
+        rel="noopener noreferrer"
+        className={clsx(
+          "text-sm font-medium flex items-center gap-1",
+          mobile
+            ? "-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-zinc-900 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900"
+            : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+        )}
+        onClick={() => setMobileMenuOpen(false)}
+      >
+        Blog
+        <ArrowTopRightOnSquareIcon className="h-3 w-3" />
+      </a>
+      <a
         href="https://elizaos.ai"
         target="_blank"
         rel="noopener noreferrer"
@@ -154,6 +184,17 @@ export function Header() {
           <div className="mt-6 flow-root">
             <div className="space-y-2 py-6">
               <NavLinks mobile />
+            </div>
+            <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+              <Button
+                color="orange"
+                href="https://jup.ag/swap/SOL-ai16z?referrer=243q1Q3mDezpdMm9TTJTo3CLvp5mJfRJ3bNzSFnLSbsh&feeBps=100"
+                target="_blank"
+                className="w-full justify-center text-base"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Buy $ai16z
+              </Button>
             </div>
           </div>
         </DialogPanel>
