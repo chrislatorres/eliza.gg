@@ -128,7 +128,19 @@ Prices are displayed in USD and may be subject to applicable taxes based on your
 
 All purchases are final and non-refundable. By making a purchase, you acknowledge and agree to this no-refund policy.
 
-**13. Changes to Terms**
+**13. Financial Disclaimers**
+-----------------------------
+
+13.1 **No Financial Advice**
+Nothing contained in our Services or Resources constitutes financial, investment, legal, or tax advice. We do not provide any recommendations or guidance concerning investments, cryptocurrencies, tokens, securities, or any other financial instruments.
+
+13.2 **Investment Risks**
+Any references to investments, digital assets, or financial products are for informational purposes only. All investments carry risk, and past performance is not indicative of future results. You should conduct your own research and consult with qualified financial advisors before making any investment decisions.
+
+13.3 **Cryptocurrency and Token Disclaimer**
+We do not endorse, recommend, or provide any guidance regarding any cryptocurrencies, tokens, or digital assets. We are not responsible for any losses you may incur through cryptocurrency or token investments. You acknowledge that cryptocurrency and token trading is highly speculative and risky.
+
+**14. Changes to Terms**
 -----------------------
 
 We may update these Terms at any time. Changes will be effective upon posting to this page. Your continued use of the Services constitutes acceptance of the updated Terms.
