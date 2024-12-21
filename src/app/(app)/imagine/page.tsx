@@ -5,7 +5,7 @@ import { Suspense } from "react";
 
 const pageTitle = "Imagine Eliza";
 const pageDescription = "Imagine and generate unique images of Eliza.";
-const pageImage = "/universe.jpg";
+const pageImage = "/imagine.png";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
