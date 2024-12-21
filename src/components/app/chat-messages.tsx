@@ -78,11 +78,26 @@ export function ChatMessages({
     };
   }, []);
 
+  console.log({
+    messages,
+    citationsMap,
+    followUpPromptsMap,
+  });
+
   return (
     <div className="flex flex-col gap-4">
       {messages.map((message, i) => {
         const assistantIndex =
-          message.role === "assistant" ? Math.floor(i / 2) : -1;
+          message.role === "assistant"
+            ? messages.slice(0, i + 1).filter((m) => m.role === "assistant")
+                .length - 1
+            : -1;
+
+        console.log({
+          i,
+          assistantIndex,
+          citationsMap,
+        });
 
         return (
           <div
@@ -93,9 +108,7 @@ export function ChatMessages({
               message={message}
               i={i}
               citations={
-                message.role === "assistant"
-                  ? citationsMap[assistantIndex]
-                  : undefined
+                message.role === "assistant" ? citationsMap[i - 1] : undefined
               }
               followUpPrompts={
                 message.role === "assistant"

@@ -1,8 +1,13 @@
 import { Citation } from "@/types/chat";
-import { ArrowRightIcon, LinkIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowRightIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  LinkIcon,
+} from "@heroicons/react/24/outline";
 import { Message } from "ai";
 import clsx from "clsx";
-import { memo } from "react";
+import { memo, useState } from "react";
 import { CodeBlock } from "./code-block";
 import { MemoizedMarkdown } from "./memoized-markdown";
 
@@ -21,6 +26,13 @@ export const ChatMessage = memo(function ChatMessage({
   followUpPrompts,
   onFollowUpClick,
 }: ChatMessageProps) {
+  const [isSourcesExpanded, setIsSourcesExpanded] = useState(false);
+
+  console.log({
+    message,
+    citations,
+    i,
+  });
   const markdownOptions = {
     forceBlock: true,
     overrides: {
@@ -30,11 +42,15 @@ export const ChatMessage = memo(function ChatMessage({
       reference: {
         component: ({ children, index }) => {
           const citationIndex = Number(index);
-          const citation = citations?.[citationIndex];
+          const citation = citations?.find((c, i) => i === citationIndex);
+
+          // If citation not found in uniqueCitations, find first citation with same URL
+          const displayCitation =
+            uniqueCitations?.find((c) => c.url === citation?.url) || citation;
 
           return (
             <a
-              href={citation?.url}
+              href={displayCitation?.url}
               target="_blank"
               rel="noopener noreferrer"
               className={clsx([
@@ -55,14 +71,16 @@ export const ChatMessage = memo(function ChatMessage({
     },
   };
 
-  // Deduplicate citations by URL
-  const uniqueCitations = citations?.reduce((acc, current) => {
-    const existingCitation = acc.find((c) => c.url === current.url);
+  // Deduplicate citations by URL and preserve order
+  const uniqueCitations = citations?.reduce((acc, current, idx) => {
+    const existingCitation = acc.find(
+      (c) => c.url === current.url && c.index === idx
+    );
     if (!existingCitation) {
-      acc.push(current);
+      acc.push({ ...current, index: idx });
     }
     return acc;
-  }, [] as Citation[]);
+  }, [] as (Citation & { index: number })[]);
 
   return (
     <div
@@ -73,46 +91,6 @@ export const ChatMessage = memo(function ChatMessage({
           : ""
       )}
     >
-      {message.role === "assistant" &&
-        uniqueCitations &&
-        uniqueCitations.length > 0 && (
-          <div className="mb-4 text-sm">
-            <div className="flex flex-wrap gap-2 text-zinc-500">
-              <span className="font-medium">Sources:</span>
-              {uniqueCitations.map((citation, index) => (
-                <a
-                  key={index}
-                  href={citation.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group inline-flex items-center gap-1.5 max-w-sm"
-                >
-                  <LinkIcon className="w-3.5 h-3.5 flex-shrink-0 text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300" />
-                  <div className="flex-1 truncate">
-                    <MemoizedMarkdown
-                      id={`citation-${message.id}-${index}`}
-                      content={citation.title}
-                      options={{
-                        wrapper: "span",
-                        forceInline: true,
-                        overrides: {
-                          p: {
-                            component: "span",
-                            props: {
-                              className:
-                                "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 truncate",
-                            },
-                          },
-                        },
-                      }}
-                    />
-                  </div>
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-
       <div
         className={clsx(
           "prose prose-zinc dark:prose-invert !max-w-full",
@@ -127,6 +105,63 @@ export const ChatMessage = memo(function ChatMessage({
           options={markdownOptions}
         />
       </div>
+
+      {message.role === "assistant" &&
+        uniqueCitations &&
+        uniqueCitations.length > 0 && (
+          <div className="mt-2 text-sm">
+            <button
+              onClick={() => setIsSourcesExpanded(!isSourcesExpanded)}
+              className="group flex items-center gap-1 py-1 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 cursor-pointer"
+            >
+              <span className="font-medium">
+                {uniqueCitations.length} source
+                {uniqueCitations.length > 1 ? "s" : ""}
+              </span>
+              <div className="flex items-center justify-center w-4 h-4">
+                {isSourcesExpanded ? (
+                  <ChevronUpIcon className="w-3 h-3" />
+                ) : (
+                  <ChevronDownIcon className="w-3 h-3" />
+                )}
+              </div>
+            </button>
+
+            {isSourcesExpanded && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {uniqueCitations.map((citation, index) => (
+                  <a
+                    key={index}
+                    href={citation.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-center gap-1.5 max-w-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+                  >
+                    <LinkIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                    <div className="flex-1 truncate">
+                      <MemoizedMarkdown
+                        id={`citation-${message.id}-${index}`}
+                        content={citation.title}
+                        options={{
+                          wrapper: "span",
+                          forceInline: true,
+                          overrides: {
+                            p: {
+                              component: "span",
+                              props: {
+                                className: "truncate",
+                              },
+                            },
+                          },
+                        }}
+                      />
+                    </div>
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
       {message.role === "assistant" && followUpPrompts?.length > 0 && (
         <div className="mt-2">
