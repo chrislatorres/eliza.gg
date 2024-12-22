@@ -18,14 +18,15 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/start",
-        destination: "https://ai16z.github.io/eliza/docs/intro/",
+        destination: "https://eliza.gg/eliza/",
         permanent: false,
       },
-      // {
-      //   source: "/profiles",
-      //   destination: "https://elizaos.github.io/profiles/",
-      //   permanent: false,
-      // },
+      {
+        source: "/school",
+        destination:
+          "https://www.youtube.com/playlist?list=PL0D_B_lUFHBKZSKgLlt24RvjJ8pavZNVh",
+        permanent: false,
+      },
       {
         source: "/docs",
         destination: "https://eliza.gg/eliza/",
@@ -42,10 +43,6 @@ const nextConfig: NextConfig = {
       {
         source: "/ingest/:path(.*)",
         destination: "https://us.i.posthog.com/:path",
-      },
-      {
-        source: "/profiles",
-        destination: "https://elizaos.github.io/profiles",
       },
       {
         source: "/profiles/:path(.*)",
