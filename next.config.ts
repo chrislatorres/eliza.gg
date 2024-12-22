@@ -42,6 +42,11 @@ const nextConfig: NextConfig = {
         destination: "https://elizaos.github.io/profiles",
         permanent: false,
       },
+      {
+        source: "/bounties",
+        destination: "https://eliza.gg/bounties/",
+        permanent: false,
+      },
     ];
   },
   async rewrites() {
@@ -57,6 +62,10 @@ const nextConfig: NextConfig = {
       {
         source: "/profiles/:path(.*)",
         destination: "https://elizaos.github.io/profiles/:path",
+      },
+      {
+        source: "/bounties/:path(.*)",
+        destination: "https://eliza.gg/bounties/:path",
       },
       {
         source: "/eliza/:path(.*)",

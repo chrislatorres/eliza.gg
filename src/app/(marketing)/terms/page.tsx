@@ -23,6 +23,9 @@ The Resources provided here are intended solely for informational purposes to as
 1.2 **No Ownership or Affiliation**
 Cogend does not claim ownership of or affiliation with the Eliza framework or ElizaOS, its trademarks, or any associated intellectual property.
 
+1.3 **No Affiliation with a16z**
+The information presented on this website is for informational purposes only. Cogend and its affiliates is in no way affiliated with, endorsed by, or officially connected to a16z, its creators, developers, or any of its subsidiaries, partners, or associated entities. Any references to a16z or its trademarks, logos, products, or services on this website are used solely for descriptive or informational purposes and do not imply any partnership, sponsorship, or endorsement by or with a16z or its associated organizations. All trademarks, service marks, and logos related to a16z are the property of their respective owners and are used herein under fair use for identification and reference purposes only. We do not claim any ownership or rights over these intellectual properties, nor do we intend to infringe upon the rights of any trademark holders.
+
 **2. User Responsibility**
 ---------------------------
 
