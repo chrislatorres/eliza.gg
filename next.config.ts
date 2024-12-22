@@ -21,11 +21,11 @@ const nextConfig: NextConfig = {
         destination: "https://ai16z.github.io/eliza/docs/intro/",
         permanent: false,
       },
-      {
-        source: "/profiles",
-        destination: "https://elizaos.github.io/profiles/",
-        permanent: false,
-      },
+      // {
+      //   source: "/profiles",
+      //   destination: "https://elizaos.github.io/profiles/",
+      //   permanent: false,
+      // },
       {
         source: "/docs",
         destination: "https://elizaos.github.io/eliza/docs/intro/",
@@ -42,6 +42,14 @@ const nextConfig: NextConfig = {
       {
         source: "/ingest/:path(.*)",
         destination: "https://us.i.posthog.com/:path",
+      },
+      {
+        source: "/profiles/:path(.*)",
+        destination: "https://elizaos.github.io/profiles/:path",
+      },
+      {
+        source: "/eliza/:path(.*)",
+        destination: "https://elizaos.github.io/eliza/:path",
       },
     ];
   },
