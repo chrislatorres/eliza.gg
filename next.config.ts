@@ -32,6 +32,11 @@ const nextConfig: NextConfig = {
         destination: "https://eliza.gg/eliza/",
         permanent: false,
       },
+      {
+        source: "/discord",
+        destination: "https://discord.gg/7qksD63gsb",
+        permanent: false,
+      },
     ];
   },
   async rewrites() {
