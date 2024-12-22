@@ -26,6 +26,11 @@ const nextConfig: NextConfig = {
         destination: "https://elizaos.github.io/profiles/",
         permanent: false,
       },
+      {
+        source: "/docs",
+        destination: "https://elizaos.github.io/eliza/docs/intro/",
+        permanent: false,
+      },
     ];
   },
   async rewrites() {
