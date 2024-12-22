@@ -28,7 +28,7 @@ const nextConfig: NextConfig = {
       // },
       {
         source: "/docs",
-        destination: "https://elizaos.github.io/eliza/docs/intro/",
+        destination: "https://eliza.gg/eliza/",
         permanent: false,
       },
     ];
