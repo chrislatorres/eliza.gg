@@ -44,6 +44,10 @@ const nextConfig: NextConfig = {
         destination: "https://us.i.posthog.com/:path",
       },
       {
+        source: "/profiles",
+        destination: "https://elizaos.github.io/profiles",
+      },
+      {
         source: "/profiles/:path(.*)",
         destination: "https://elizaos.github.io/profiles/:path",
       },
