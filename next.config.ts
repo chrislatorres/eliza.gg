@@ -44,7 +44,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/bounties",
-        destination: "https://eliza.gg/bounties/",
+        destination: "https://elizaos.github.io/website/",
         permanent: false,
       },
     ];
@@ -65,7 +65,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/bounties/:path(.*)",
-        destination: "https://eliza.gg/bounties/:path",
+        destination: "https://elizaos.github.io/website/:path",
       },
       {
         source: "/eliza/:path(.*)",
