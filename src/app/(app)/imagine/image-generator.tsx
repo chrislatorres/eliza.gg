@@ -95,7 +95,7 @@ export function ImageGenerator() {
   );
 
   return (
-    <main className="flex flex-col min-h-dvh">
+    <main className="flex flex-col min-h-full">
       <div className="flex-1 relative mx-auto w-full">
         <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
           {/* Image Display Area */}

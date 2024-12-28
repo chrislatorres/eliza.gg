@@ -117,7 +117,7 @@ export function Header() {
   );
 
   return (
-    <header className="absolute md:fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-sm dark:bg-black/80">
+    <header className="absolute md:fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-sm dark:bg-black/80">
       <nav className="px-4 lg:px-6" aria-label="Global">
         <div className="flex items-center justify-between py-4">
           <div className="flex">

@@ -1,6 +1,7 @@
 import { siteConfig } from "@/app/constants";
 import { Metadata } from "next";
 import { Suspense } from "react";
+import { getPartnerships } from "./actions";
 import { PartnershipsRequests } from "./partnership-requests";
 
 const pageTitle = "Partnership Program";
@@ -32,10 +33,30 @@ export const metadata: Metadata = {
   },
 };
 
+function LoadingPartnershipRequests() {
+  return (
+    <div className="flex min-h-dvh items-center justify-center">
+      <div className="text-center">
+        <div className="text-lg font-medium">
+          Loading partnership requests...
+        </div>
+        <div className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+          Please wait while we fetch the latest data
+        </div>
+      </div>
+    </div>
+  );
+}
+
+async function PartnershipRequestsWrapper() {
+  const initialData = await getPartnerships();
+  return <PartnershipsRequests initialData={initialData} />;
+}
+
 export default function Page() {
   return (
-    <Suspense fallback={null}>
-      <PartnershipsRequests />
+    <Suspense fallback={<LoadingPartnershipRequests />}>
+      <PartnershipRequestsWrapper />
     </Suspense>
   );
 }

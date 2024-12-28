@@ -1,6 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   logging: false,
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
@@ -78,4 +77,4 @@ const nextConfig: NextConfig = {
   skipTrailingSlashRedirect: true,
 };
 
-export default nextConfig;
+module.exports = nextConfig;
