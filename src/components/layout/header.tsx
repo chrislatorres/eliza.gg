@@ -132,10 +132,10 @@ export function Header() {
           <div className="hidden md:flex md:flex-1 md:justify-end">
             <Button
               color="orange"
-              href="https://www.daos.fun/HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzXbB8n4V98jwC"
+              href="https://eliza.gg/discord"
               target="_blank"
             >
-              Become Partner
+              Join Discord
             </Button>
           </div>
         </div>
