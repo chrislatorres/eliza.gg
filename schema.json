@@ -33,6 +33,19 @@
           "defaultValue": "pending"
         }
       ]
+    },
+    {
+      "name": "ai_logs",
+      "columns": [
+        {
+          "name": "userMessage",
+          "type": "text"
+        },
+        {
+          "name": "aiResponse",
+          "type": "text"
+        }
+      ]
     }
   ]
 }

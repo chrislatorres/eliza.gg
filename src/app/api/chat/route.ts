@@ -1,6 +1,7 @@
 import { ELIZA_MODEL } from "@/lib/ai/models";
 import { createTurso } from "@/lib/indexer/utils/create-turso";
 import { embed } from "@/lib/indexer/utils/embed";
+import { getXataClient } from "@/xata";
 import {
   createDataStreamResponse,
   generateObject,
@@ -8,6 +9,8 @@ import {
   streamText,
 } from "ai";
 import { z } from "zod";
+
+const xata = getXataClient();
 
 const generateFollowUpPrompts = async (query: string, context: string) => {
   try {
@@ -230,8 +233,18 @@ export async function POST(request: Request) {
         `.trim(),
         // most recent 5 messages
         messages: messages.slice(-5),
-        onFinish: async () => {
-          // Only send follow-ups after the main response is complete
+        onFinish: async ({ text }) => {
+          // Log the interaction
+          try {
+            await xata.db.ai_logs.create({
+              userMessage: query,
+              aiResponse: text,
+            });
+          } catch (error) {
+            console.error("Error logging AI interaction:", error);
+          }
+
+          // Handle follow-up prompts
           try {
             const followUpPrompts = await followUpPromptPromise;
             if (followUpPrompts && followUpPrompts.length > 0) {

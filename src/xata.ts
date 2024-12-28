@@ -17,6 +17,13 @@ const tables = [
       { name: "status", type: "text", defaultValue: "pending" },
     ],
   },
+  {
+    name: "ai_logs",
+    columns: [
+      { name: "userMessage", type: "text" },
+      { name: "aiResponse", type: "text" },
+    ],
+  },
 ] as const;
 
 export type SchemaTables = typeof tables;
@@ -25,8 +32,12 @@ export type InferredTypes = SchemaInference<SchemaTables>;
 export type Partnerships = InferredTypes["partnerships"];
 export type PartnershipsRecord = Partnerships & XataRecord;
 
+export type AiLogs = InferredTypes["ai_logs"];
+export type AiLogsRecord = AiLogs & XataRecord;
+
 export type DatabaseSchema = {
   partnerships: PartnershipsRecord;
+  ai_logs: AiLogsRecord;
 };
 
 const DatabaseClient = buildClient();
