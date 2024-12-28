@@ -1,7 +1,6 @@
 "use client";
 
 import { Dialog, DialogBody, DialogTitle } from "@/components/ui/dialog";
-import { Select } from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -12,11 +11,7 @@ import {
 } from "@/components/ui/table";
 import { useState } from "react";
 import useSWR from "swr";
-import {
-  getPartnerships,
-  updatePartnershipStatus,
-  type Partnership,
-} from "./actions";
+import { getPartnerships, type Partnership } from "./actions";
 
 interface PartnershipsRequestsProps {
   initialData: Partnership[];
@@ -48,15 +43,6 @@ export function PartnershipsRequests({
     partnership: null,
   });
 
-  const handleStatusChange = async (id: string, status: string) => {
-    try {
-      await updatePartnershipStatus(id, status);
-      await mutate();
-    } catch (error) {
-      console.error("Failed to update status:", error);
-    }
-  };
-
   return (
     <main className="flex flex-col min-h-dvh pt-16">
       <div className="flex-1 relative mx-auto w-full max-w-7xl px-4 py-8">
@@ -76,7 +62,6 @@ export function PartnershipsRequests({
               <TableHeader>Category</TableHeader>
               <TableHeader>Interests</TableHeader>
               <TableHeader>Contact</TableHeader>
-              <TableHeader>Status</TableHeader>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -105,18 +90,6 @@ export function PartnershipsRequests({
                   onClick={() => setDialog({ isOpen: true, partnership })}
                 >
                   {partnership.contactInfo}
-                </TableCell>
-                <TableCell>
-                  <Select
-                    value={partnership.status}
-                    onChange={(e) =>
-                      handleStatusChange(partnership.id, e.target.value)
-                    }
-                  >
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
-                  </Select>
                 </TableCell>
               </TableRow>
             ))}
