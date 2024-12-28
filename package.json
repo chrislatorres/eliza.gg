@@ -45,6 +45,7 @@
     "braintrust": "^0.0.177",
     "clsx": "^2.1.1",
     "codemirror": "^6.0.1",
+    "date-fns": "^4.1.0",
     "eslint-plugin-path-alias": "^2.1.0",
     "eslint-plugin-tailwindcss": "^3.17.5",
     "ethers": "v5",
