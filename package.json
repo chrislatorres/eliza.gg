@@ -39,6 +39,7 @@
     "@tailwindcss/postcss": "^4.0.0-beta.1",
     "@uiw/codemirror-theme-github": "4.21.19",
     "@vercel/analytics": "^1.4.1",
+    "@xata.io/client": "^0.30.1",
     "agiverse": "^0.1.1",
     "ai": "^4.0.20",
     "braintrust": "^0.0.177",

@@ -41,6 +41,18 @@ export function Header() {
       >
         Imagine
       </Link>
+      <Link
+        href="/partnerships"
+        className={clsx(
+          "text-sm font-medium",
+          mobile
+            ? "-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-zinc-900 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900"
+            : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+        )}
+        onClick={() => setMobileMenuOpen(false)}
+      >
+        Partnerships
+      </Link>
       <a
         href="https://elizagen.howieduhzit.best/"
         target="_blank"

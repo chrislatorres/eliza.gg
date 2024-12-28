@@ -1,0 +1,38 @@
+{
+  "tables": [
+    {
+      "name": "partnerships",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "notNull": true,
+          "defaultValue": ""
+        },
+        {
+          "name": "category",
+          "type": "text",
+          "notNull": true,
+          "defaultValue": ""
+        },
+        {
+          "name": "interests",
+          "type": "text",
+          "notNull": true,
+          "defaultValue": ""
+        },
+        {
+          "name": "contactInfo",
+          "type": "text",
+          "notNull": true,
+          "defaultValue": ""
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "defaultValue": "pending"
+        }
+      ]
+    }
+  ]
+}

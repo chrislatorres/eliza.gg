@@ -1,0 +1,6 @@
+{
+  "databaseURL": "https://Christopher-La-Torres-s-workspace-rr2kpv.us-east-1.xata.sh/db/eliza",
+  "codegen": {
+    "output": "src/xata.ts"
+  }
+}
