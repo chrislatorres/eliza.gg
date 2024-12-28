@@ -105,14 +105,355 @@ async function fetchMarkdownContent(path: string) {
   return content;
 }
 
+// Add these new interfaces near the top of the file
+interface GitHubIssue {
+  number: number;
+  title: string;
+  body: string;
+  comments_url: string;
+  html_url: string;
+  created_at: string;
+}
+
+interface GitHubComment {
+  body: string;
+  html_url: string;
+  created_at: string;
+}
+
+// Add these new interfaces and types near the top of the file
+interface BatchProcessingResult {
+  successCount: number;
+  failureCount: number;
+  lastProcessedPage: number;
+  documents: Array<{ content: string; metadata: any }>;
+}
+
+// Modify the fetchGitHubIssues function to accept more parameters
+async function fetchGitHubIssues(
+  page = 1,
+  perPage = 30,
+  since?: string
+): Promise<GitHubIssue[]> {
+  const sinceParam = since ? `&since=${since}` : "";
+  log(`Fetching GitHub issues page ${page} (${perPage} per page)`);
+
+  const response = await fetch(
+    `https://api.github.com/repos/ai16z/eliza/issues?state=all&page=${page}&per_page=${perPage}${sinceParam}`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+        Accept: "application/vnd.github.v3+json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    const error = `GitHub API error: ${response.statusText} for issues page ${page}`;
+    logError(error, response);
+    throw new Error(error);
+  }
+
+  const issues = await response.json();
+  log(`Found ${issues.length} issues on page ${page}`);
+  return issues;
+}
+
+async function fetchIssueComments(
+  comments_url: string
+): Promise<GitHubComment[]> {
+  log(`Fetching comments for ${comments_url}`);
+  const response = await fetch(comments_url, {
+    headers: {
+      Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+      Accept: "application/vnd.github.v3+json",
+    },
+  });
+
+  if (!response.ok) {
+    const error = `GitHub API error: ${response.statusText} for comments ${comments_url}`;
+    logError(error, response);
+    throw new Error(error);
+  }
+
+  const comments = await response.json();
+  log(`Found ${comments.length} comments`);
+  return comments;
+}
+
+// Add this helper function to convert embeddings to the correct format
+function float32ArrayToUint8Array(floats: number[]): Uint8Array {
+  const float32Array = new Float32Array(floats);
+  return new Uint8Array(float32Array.buffer);
+}
+
+// Update the processIssueBatch function with the missing insertion logic
+async function processIssueBatch(
+  startPage: number,
+  batchSize: number,
+  since?: string
+): Promise<BatchProcessingResult> {
+  let successCount = 0;
+  let failureCount = 0;
+  let currentPage = startPage;
+  const perPage = 30; // GitHub API default
+  let processedIssues: Array<{ content: string; metadata: any }> = [];
+
+  try {
+    while (processedIssues.length < batchSize) {
+      const issues = await fetchGitHubIssues(currentPage, perPage, since);
+      if (issues.length === 0) break;
+
+      // Process each issue and its comments
+      for (const issue of issues) {
+        if (processedIssues.length >= batchSize) break;
+
+        try {
+          // Add issue itself
+          processedIssues.push({
+            content: `Title: ${issue.title}\n\n${issue.body || ""}`,
+            metadata: {
+              title: `Issue #${issue.number}: ${issue.title}`,
+              url: issue.html_url,
+              type: "issue",
+              created_at: issue.created_at,
+            },
+          });
+
+          // Fetch and add comments
+          const comments = await fetchIssueComments(issue.comments_url);
+          for (const comment of comments) {
+            processedIssues.push({
+              content: comment.body,
+              metadata: {
+                title: `Comment on Issue #${issue.number}`,
+                url: comment.html_url,
+                type: "issue_comment",
+                created_at: comment.created_at,
+              },
+            });
+          }
+          successCount++;
+        } catch (error) {
+          failureCount++;
+          logError(`Failed to process issue #${issue.number}`, error);
+        }
+      }
+      currentPage++;
+    }
+
+    // Process the batch of documents
+    if (processedIssues.length > 0) {
+      const contentHashes = processedIssues.map((doc) =>
+        String(hashString(doc.content))
+      );
+      const existingDocs = await checkExistingDocs(contentHashes);
+
+      // Filter out existing documents
+      const newDocs = processedIssues.filter(
+        (doc, i) => !existingDocs.has(contentHashes[i])
+      );
+
+      if (newDocs.length > 0) {
+        try {
+          const embeddings = await embedBatch(
+            newDocs.map((doc) => doc.content)
+          );
+
+          // Insert new documents into the database
+          for (let i = 0; i < newDocs.length; i++) {
+            const doc = newDocs[i];
+            const embedding = embeddings[i];
+
+            if (!validateEmbedding(embedding)) {
+              logError(`Invalid embedding format for document ${i}`, {
+                docTitle: doc.metadata.title,
+                embeddingLength: embedding?.length,
+                sampleValues: embedding?.slice(0, 5),
+              });
+              failureCount++;
+              continue;
+            }
+
+            try {
+              await turso.execute({
+                sql: `
+                  INSERT OR IGNORE INTO docs (hash, title, url, content, full_emb, type, created_at)
+                  VALUES (?, ?, ?, ?, vector32(?), ?, ?)
+                `,
+                args: [
+                  String(hashString(doc.content)),
+                  doc.metadata.title,
+                  doc.metadata.url,
+                  doc.content,
+                  float32ArrayToUint8Array(embedding),
+                  doc.metadata.type || "document",
+                  doc.metadata.created_at || new Date().toISOString(),
+                ],
+              });
+              successCount++;
+              log(`Inserted document ${i + 1}/${newDocs.length}`);
+            } catch (error) {
+              failureCount++;
+              logError(
+                `Failed to insert document ${i + 1}/${newDocs.length}`,
+                error
+              );
+            }
+          }
+        } catch (error) {
+          logError("Failed to generate or process embeddings batch", error);
+          failureCount += newDocs.length;
+        }
+      }
+    }
+
+    return {
+      successCount,
+      failureCount,
+      lastProcessedPage: currentPage - 1,
+      documents: processedIssues,
+    };
+  } catch (error) {
+    logError("Batch processing failed", error);
+    throw error;
+  }
+}
+
+// Add this new function to track the last processed date
+async function getLastProcessedDate(): Promise<string | undefined> {
+  try {
+    // First check if the column exists
+    const tableInfo = await turso.execute(`PRAGMA table_info(docs)`);
+    const hasCreatedAt = tableInfo.rows.some(
+      (row: any) => row.name === "created_at"
+    );
+
+    if (!hasCreatedAt) {
+      await turso.execute(`
+        ALTER TABLE docs
+        ADD COLUMN created_at TEXT
+      `);
+
+      await turso.execute(`
+        UPDATE docs
+        SET created_at = datetime('now')
+        WHERE created_at IS NULL
+      `);
+
+      return undefined;
+    }
+
+    const result = await turso.execute(`
+      SELECT MAX(created_at) as last_date
+      FROM docs
+    `);
+
+    return result.rows[0].last_date
+      ? String(result.rows[0].last_date)
+      : undefined;
+  } catch (error) {
+    logError("Failed to get last processed date", error);
+    return undefined;
+  }
+}
+
+// Modify processAllIssuesInBatches to return the processed documents
+async function processAllIssuesInBatches(
+  batchSize = 100
+): Promise<Array<{ content: string; metadata: any }>> {
+  let currentPage = 1;
+  let totalSuccess = 0;
+  let totalFailure = 0;
+  let hasMore = true;
+  let allProcessedDocs: Array<{ content: string; metadata: any }> = [];
+
+  const lastProcessedDate = await getLastProcessedDate();
+
+  while (hasMore) {
+    try {
+      log(`Processing batch starting from page ${currentPage}`);
+      const result = await processIssueBatch(
+        currentPage,
+        batchSize,
+        lastProcessedDate
+      );
+
+      totalSuccess += result.successCount;
+      totalFailure += result.failureCount;
+      currentPage = result.lastProcessedPage + 1;
+
+      // Store the processed documents
+      if (result.documents) {
+        allProcessedDocs = [...allProcessedDocs, ...result.documents];
+      }
+
+      // If we processed less than the batch size, we're done
+      if (result.successCount + result.failureCount < batchSize) {
+        hasMore = false;
+      }
+
+      // Add a delay to avoid rate limiting
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      log(
+        `Batch complete. Total success: ${totalSuccess}, Total failure: ${totalFailure}`
+      );
+    } catch (error) {
+      logError(
+        `Failed to process batch starting at page ${currentPage}`,
+        error
+      );
+      break;
+    }
+  }
+
+  return allProcessedDocs;
+}
+
+// Add this function near the top
+type Hash = string; // Using a type alias for clarity
+
+async function checkExistingDocs(hashes: Hash[]): Promise<Set<Hash>> {
+  log(`Checking for ${hashes.length} existing documents`);
+  const existing = new Set<Hash>();
+
+  // Query in batches to avoid overwhelming the database
+  const QUERY_BATCH_SIZE = 500;
+  for (let i = 0; i < hashes.length; i += QUERY_BATCH_SIZE) {
+    const batch = hashes.slice(i, i + QUERY_BATCH_SIZE);
+    const placeholders = batch.map(() => "?").join(",");
+    const result = await turso.execute({
+      sql: `SELECT hash FROM docs WHERE hash IN (${placeholders})`,
+      args: batch,
+    });
+
+    // Ensure we're handling the hash as a string
+    result.rows.forEach((row) => existing.add(String(row.hash)));
+  }
+
+  log(`Found ${existing.size} existing documents`);
+  return existing;
+}
+
+// Add this helper function inside processIssueBatch
+function validateEmbedding(embedding: any): boolean {
+  return (
+    embedding &&
+    Array.isArray(embedding) &&
+    embedding.length === 512 &&
+    embedding.every((n) => typeof n === "number" && !isNaN(n))
+  );
+}
+
 console.time("total-execution");
 log("Starting indexing process");
 
 log("Setting up database");
 console.time("db-setup");
 // drop tables
-await turso.execute(`DROP TABLE IF EXISTS embedding_cache`);
-await turso.execute(`DROP TABLE IF EXISTS docs`);
+// await turso.execute(`DROP TABLE IF EXISTS embedding_cache`);
+// await turso.execute(`DROP TABLE IF EXISTS docs`);
 
 await turso.execute(`
 CREATE TABLE IF NOT EXISTS embedding_cache (
@@ -125,11 +466,13 @@ CREATE TABLE IF NOT EXISTS embedding_cache (
 await turso.execute(
   `
 CREATE TABLE IF NOT EXISTS docs (
-  hash     TEXT PRIMARY KEY,
-  title    TEXT,
-  url      TEXT,
-  content  TEXT,
-  full_emb F32_BLOB(512)
+  hash       TEXT PRIMARY KEY,
+  title      TEXT,
+  url        TEXT,
+  content    TEXT,
+  full_emb   F32_BLOB(512),
+  type       TEXT DEFAULT 'document',
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 `
 );
@@ -163,9 +506,19 @@ const markdownContents = await Promise.all(
 console.timeEnd("fetch-all");
 log(`Successfully fetched all ${markdownContents.length} documents`);
 
-log("Chunking markdown content");
+log("Fetching issues and comments in batches");
+console.time("fetch-issues");
+const issueContents = await processAllIssuesInBatches(100); // Process 100 issues at a time
+console.timeEnd("fetch-issues");
+log(`Successfully fetched ${issueContents.length} issue-related documents`);
+
+// Combine markdown and issue contents
+const allContents = [...markdownContents, ...issueContents];
+log(`Total documents to process: ${allContents.length}`);
+
+log("Chunking all content");
 console.time("chunk-all");
-const markdownContentChunks = markdownContents
+const contentChunks = allContents
   .map(({ content, metadata }) => {
     const chunks = chunkMarkdown(content, metadata);
     log(`Created ${chunks.length} chunks for ${metadata.title}`);
@@ -173,77 +526,88 @@ const markdownContentChunks = markdownContents
   })
   .flat();
 console.timeEnd("chunk-all");
-log(`Created total of ${markdownContentChunks.length} chunks`);
+log(`Created total of ${contentChunks.length} chunks`);
 
-log("Generating embeddings");
-console.time("embeddings-all");
-const embeddings = await embedBatch(
-  markdownContentChunks.map((chunk) => chunk.content)
+log("Preparing documents for processing");
+// Ensure hashString returns a string
+const contentHashes = contentChunks.map((chunk) =>
+  String(hashString(chunk.content))
 );
+const existingDocs = await checkExistingDocs(contentHashes);
+
+// Filter out existing documents
+const newChunks = contentChunks.filter(
+  (chunk, i) => !existingDocs.has(String(contentHashes[i]))
+);
+
+if (newChunks.length === 0) {
+  log("No new documents to process");
+  console.timeEnd("total-execution");
+  process.exit(0);
+}
+
+log(`Processing ${newChunks.length} new documents`);
+
+// Only generate embeddings for new documents
+log("Generating embeddings for new documents");
+console.time("embeddings-all");
+const embeddings = await embedBatch(newChunks.map((chunk) => chunk.content));
 console.timeEnd("embeddings-all");
 log(`Generated ${embeddings.length} embeddings`);
 
 log("Inserting into database");
 console.time("db-insert");
-
-// Split into smaller batches to avoid overwhelming the database
-const BATCH_SIZE = 100;
 let successCount = 0;
 let failureCount = 0;
 
-for (let i = 0; i < markdownContentChunks.length; i += BATCH_SIZE) {
-  const batch = markdownContentChunks.slice(i, i + BATCH_SIZE);
-  const batchOperations = batch.map((chunk, j) => ({
-    sql: `
-      INSERT OR IGNORE INTO docs (hash, title, url, content, full_emb)
-      VALUES (?, ?, ?, ?, vector32(?))
-    `,
-    args: [
-      hashString(chunk.content),
-      chunk.metadata.title,
-      chunk.metadata.url,
-      chunk.content,
-      `[${embeddings[i + j].join(", ")}]`,
-    ],
-  }));
+for (let i = 0; i < newChunks.length; i++) {
+  const chunk = newChunks[i];
+  const embedding = embeddings[i];
+
+  // Better embedding validation
+  if (!embedding) {
+    log(`Missing embedding for document ${i}`);
+    failureCount++;
+    continue;
+  }
+
+  // Ensure embedding is in the correct format
+  const vectorData = Array.isArray(embedding)
+    ? embedding
+    : Object.values(embedding);
+  if (
+    vectorData.length !== 512 ||
+    !vectorData.every((n) => typeof n === "number")
+  ) {
+    logError(`Invalid embedding format for document ${i}`, {
+      length: vectorData.length,
+      sample: vectorData.slice(0, 5),
+    });
+    failureCount++;
+    continue;
+  }
 
   try {
-    log(
-      `Processing batch ${i / BATCH_SIZE + 1}/${Math.ceil(
-        markdownContentChunks.length / BATCH_SIZE
-      )}`
-    );
-    await retryOperation(async () => {
-      await turso.batch(batchOperations, "write");
+    await turso.execute({
+      sql: `
+        INSERT OR IGNORE INTO docs (hash, title, url, content, full_emb)
+        VALUES (?, ?, ?, ?, vector32(?))
+      `,
+      args: [
+        String(hashString(chunk.content)),
+        chunk.metadata.title,
+        chunk.metadata.url,
+        chunk.content,
+        float32ArrayToUint8Array(vectorData),
+      ],
     });
-    successCount += batch.length;
-    log(`Successfully inserted batch of ${batch.length} documents`);
+    successCount++;
+    log(`Inserted document ${i + 1}/${newChunks.length}`);
   } catch (error) {
-    logError(`Failed to insert batch starting at index ${i}`, error);
-    failureCount += batch.length;
-
-    // Try inserting one by one for failed batches
-    log("Attempting individual insertions for failed batch");
-    for (const [j, operation] of batchOperations.entries()) {
-      try {
-        await retryOperation(async () => {
-          await turso.execute(operation);
-        });
-        successCount++;
-        failureCount--;
-        log(`Successfully inserted individual document ${i + j}`);
-      } catch (error) {
-        logError(`Failed to insert individual document ${i + j}`, error);
-      }
-    }
+    failureCount++;
+    logError(`Failed to insert document ${i + 1}/${newChunks.length}`, error);
   }
 }
 
-console.timeEnd("db-insert");
 log(`Insertion complete. Success: ${successCount}, Failures: ${failureCount}`);
-
-log(
-  `Successfully inserted ${markdownContentChunks.length} documents into the database`
-);
-console.timeEnd("total-execution");
-log("Indexing process complete");
+console.timeEnd("db-insert");

@@ -97,13 +97,34 @@ export async function embedBatch(texts: string[]) {
   let allEmbeddings = [];
 
   console.time("embedBatch-api-calls");
-  for (let i = 0; i < nonCached.length; i += BATCH_SIZE) {
-    const batch = nonCached.slice(i, i + BATCH_SIZE);
-    const results = await client.embed({
-      input: batch,
-      model: "voyage-3-lite",
-    });
-    allEmbeddings.push(...results.data.map((result) => result.embedding));
+  try {
+    for (let i = 0; i < nonCached.length; i += BATCH_SIZE) {
+      const batch = nonCached.slice(i, i + BATCH_SIZE);
+      const results = await client.embed({
+        input: batch,
+        model: "voyage-3-lite",
+      });
+
+      // Validate embeddings before adding them
+      const validEmbeddings = results.data.map((result) => {
+        const embedding = result.embedding;
+        if (
+          !embedding ||
+          !Array.isArray(embedding) ||
+          embedding.length !== 512
+        ) {
+          throw new Error(
+            `Invalid embedding format: expected array of 512 numbers, got ${embedding?.length} elements`
+          );
+        }
+        return embedding;
+      });
+
+      allEmbeddings.push(...validEmbeddings);
+    }
+  } catch (error) {
+    logError("Failed to generate embeddings batch", error);
+    throw error;
   }
   console.timeEnd("embedBatch-api-calls");
 
@@ -149,5 +170,5 @@ export async function embedBatch(texts: string[]) {
   console.timeEnd("embedBatch-cache-store");
 
   console.timeEnd("embedBatch-total");
-  return [...allEmbeddings, ...cached];
+  return [...allEmbeddings, ...cached.map((c) => JSON.parse(String(c)))];
 }
