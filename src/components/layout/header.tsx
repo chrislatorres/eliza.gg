@@ -1,8 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Dialog } from "@/components/ui/dialog";
 import { Logo } from "@/components/ui/logo";
-import { Dialog, DialogPanel } from "@headlessui/react";
 import {
   ArrowTopRightOnSquareIcon,
   Bars3Icon,
@@ -117,7 +117,7 @@ export function Header() {
   );
 
   return (
-    <header className="absolute md:fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-sm dark:bg-black/80">
+    <header className="absolute top-0 left-0 right-0 z-10 ">
       <nav className="px-4 lg:px-6" aria-label="Global">
         <div className="flex items-center justify-between py-4">
           <div className="flex">
@@ -154,13 +154,12 @@ export function Header() {
       </nav>
 
       <Dialog
-        as="div"
-        className="lg:hidden"
         open={mobileMenuOpen}
         onClose={setMobileMenuOpen}
+        className="lg:hidden"
+        variant="slideout"
       >
-        <div className="fixed inset-0 z-10" />
-        <DialogPanel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white dark:bg-black px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-zinc-900/10 dark:sm:ring-white/10">
+        <div className="px-6 py-6 h-full">
           <div className="flex items-center justify-between">
             <Link
               href="/"
@@ -193,7 +192,7 @@ export function Header() {
               </Button>
             </div>
           </div>
-        </DialogPanel>
+        </div>
       </Dialog>
     </header>
   );
