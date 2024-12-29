@@ -2,6 +2,7 @@
 
 import { ImageExamplePrompts } from "@/components/app/image-example-prompts";
 import { TextareaWithActions } from "@/components/app/textarea-with-actions";
+import { fal } from "@fal-ai/client";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
@@ -23,12 +24,6 @@ export function ImageGenerator() {
         return;
       }
 
-      toast.error(
-        "You're currently out of credits! DM @chrislatorres to get more"
-      );
-      return;
-
-      /* Commented out image generation code
       toast.message("Generating your image...", {
         description: promptToUse,
       });
@@ -73,7 +68,6 @@ export function ImageGenerator() {
       } finally {
         setIsGenerating(false);
       }
-      */
     },
     [prompt]
   );
