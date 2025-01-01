@@ -28,10 +28,3 @@ bun run --bun dev
 ```
 
 3. Open [http://localhost:3000](http://localhost:3000)
-
-## Technical Stack
-
-- **Framework**: Next.js
-- **Styling**: TailwindCSS
-- **Database**: Turso for vector database
-- **Models**: Cerebras for `llama-3.3-70b` LLM

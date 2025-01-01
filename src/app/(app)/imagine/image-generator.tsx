@@ -32,7 +32,7 @@ export function ImageGenerator() {
       try {
         const result = await fal.subscribe("fal-ai/flux-lora", {
           input: {
-            prompt: `An image of eliza, wearing an orange shirt that says "ai16z" in bold white letters, ${promptToUse}`,
+            prompt: `An image of eliza, wearing an orange shirt, ${promptToUse}`,
             loras: [
               {
                 path: ELIZA_LORA,
