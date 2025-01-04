@@ -28,11 +28,6 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
       {
-        source: "/docs",
-        destination: "https://eliza.gg/eliza/",
-        permanent: false,
-      },
-      {
         source: "/discord",
         destination: "https://discord.gg/2bkryvK9Yu",
         permanent: false,
