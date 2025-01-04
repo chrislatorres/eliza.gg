@@ -18,6 +18,9 @@ const isPublicRoute = createRouteMatcher([
   // API
   "/api/(.*)",
 
+  // Docs
+  "/docs(.*)",
+
   // Static
   "/sitemap(.*)",
   "/.well-known/apple-developer-merchantid-domain-association",
