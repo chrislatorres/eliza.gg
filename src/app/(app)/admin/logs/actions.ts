@@ -17,7 +17,7 @@ export const getLogs = unstable_cache(
     const logs = await xata.db.ai_logs
       .select(["id", "userMessage", "aiResponse", "xata.createdAt"])
       .sort("xata.createdAt", "desc")
-      .getAll();
+      .getMany();
 
     return logs.map((log) => ({
       id: log.id,
