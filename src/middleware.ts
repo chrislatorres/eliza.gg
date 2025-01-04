@@ -19,6 +19,7 @@ const isPublicRoute = createRouteMatcher([
   "/api/(.*)",
 
   // Docs
+  "/docs",
   "/docs(.*)",
 
   // Static
