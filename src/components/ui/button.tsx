@@ -48,9 +48,9 @@ export const styles = {
   ],
   plain: [
     // Base
-    "border-transparent text-zinc-950 data-active:bg-zinc-950/5 data-hover:bg-zinc-950/5",
+    "border-transparent text-zinc-950 data-active:bg-zinc-950/5 data-hover:bg-zinc-950/5 hover:bg-zinc-950/5",
     // Dark mode
-    "dark:text-white dark:data-active:bg-white/10 dark:data-hover:bg-white/10",
+    "dark:text-white dark:data-active:bg-white/10 dark:data-hover:bg-white/10 dark:hover:bg-white/10",
     // Icon
     "[--btn-icon:var(--color-zinc-500)] data-active:[--btn-icon:var(--color-zinc-700)] data-hover:[--btn-icon:var(--color-zinc-700)] dark:[--btn-icon:var(--color-zinc-500)] dark:data-active:[--btn-icon:var(--color-zinc-400)] dark:data-hover:[--btn-icon:var(--color-zinc-400)]",
   ],

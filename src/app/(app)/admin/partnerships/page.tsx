@@ -4,9 +4,9 @@ import { Suspense } from "react";
 import { getPartnerships } from "./actions";
 import { PartnershipsRequests } from "./partnership-requests";
 
-const pageTitle = "Partnership Program";
+const pageTitle = "Admin Partnerships";
 const pageDescription =
-  "Submit your partnership or collaboration request for the Eliza ecosystem.";
+  "Admin view of partnership or collaboration requests for Eliza.";
 const pageImage = "/partnerships.jpg";
 
 export const metadata: Metadata = {
