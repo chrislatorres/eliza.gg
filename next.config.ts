@@ -6,7 +6,6 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === "production",
   },
   experimental: {
-    dynamicIO: true,
     ppr: true,
     inlineCss: true,
   },
@@ -35,7 +34,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/discord",
-        destination: "https://discord.gg/7qksD63gsb",
+        destination: "https://discord.gg/2bkryvK9Yu",
         permanent: false,
       },
       {
@@ -71,6 +70,14 @@ const nextConfig: NextConfig = {
       {
         source: "/eliza/:path(.*)",
         destination: "https://elizaos.github.io/eliza/:path",
+      },
+      {
+        source: "/docs",
+        destination: "https://cogend.mintlify.dev/docs",
+      },
+      {
+        source: "/docs/:match*",
+        destination: "https://cogend.mintlify.dev/docs/:match*",
       },
     ];
   },

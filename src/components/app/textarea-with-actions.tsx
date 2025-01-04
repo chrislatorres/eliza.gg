@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRightIcon } from "@heroicons/react/24/outline";
+import { ArrowUpIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { Loader2 } from "lucide-react";
 import { memo } from "react";
@@ -67,7 +67,7 @@ const ChatForm = memo(function ChatForm({
           {isLoading ? (
             <Loader2 className="!h-3 !w-3 !shrink-0 animate-spin" />
           ) : (
-            <ArrowRightIcon className="!h-3 !w-3 !shrink-0" />
+            <ArrowUpIcon className="!h-3 !w-3 !shrink-0" />
           )}
         </Button>
       </div>
@@ -102,7 +102,7 @@ export const TextareaWithActions = memo(function TextareaWithActions({
           className={clsx([
             "relative block size-full appearance-none overflow-hidden rounded-lg",
             "text-base/6 text-zinc-950 placeholder:text-zinc-400 sm:text-sm/6 dark:text-white",
-            "bg-zinc-100 dark:bg-zinc-950",
+            "bg-zinc-950/5 dark:bg-white/5",
             "focus:outline-none",
             "data-[invalid]:border-red-500 data-[invalid]:data-[hover]:border-red-500 data-[invalid]:dark:border-red-600 data-[invalid]:data-[hover]:dark:border-red-600",
             "disabled:border-zinc-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:data-[hover]:disabled:border-white/15",

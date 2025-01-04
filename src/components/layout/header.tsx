@@ -29,60 +29,6 @@ export function Header() {
       >
         Explore
       </Link>
-      <Link
-        href="/imagine"
-        className={clsx(
-          "text-sm font-medium",
-          mobile
-            ? "-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-zinc-900 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900"
-            : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-        )}
-        onClick={() => setMobileMenuOpen(false)}
-      >
-        Imagine
-      </Link>
-      <Link
-        href="/partnerships"
-        className={clsx(
-          "text-sm font-medium",
-          mobile
-            ? "-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-zinc-900 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900"
-            : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-        )}
-        onClick={() => setMobileMenuOpen(false)}
-      >
-        Partnerships
-      </Link>
-      <a
-        href="https://elizagen.howieduhzit.best/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className={clsx(
-          "text-sm font-medium flex items-center gap-1",
-          mobile
-            ? "-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-zinc-900 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900"
-            : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-        )}
-        onClick={() => setMobileMenuOpen(false)}
-      >
-        Generator
-        <ArrowTopRightOnSquareIcon className="h-3 w-3" />
-      </a>
-      <a
-        href="https://eliza.gg/bounties/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className={clsx(
-          "text-sm font-medium flex items-center gap-1",
-          mobile
-            ? "-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-zinc-900 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900"
-            : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-        )}
-        onClick={() => setMobileMenuOpen(false)}
-      >
-        Bounties
-        <ArrowTopRightOnSquareIcon className="h-3 w-3" />
-      </a>
       <a
         href="https://eliza.gg/eliza/"
         target="_blank"
@@ -98,26 +44,11 @@ export function Header() {
         Docs
         <ArrowTopRightOnSquareIcon className="h-3 w-3" />
       </a>
-      <a
-        href="https://elizaos.ai"
-        target="_blank"
-        rel="noopener noreferrer"
-        className={clsx(
-          "text-sm font-medium flex items-center gap-1",
-          mobile
-            ? "-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-zinc-900 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900"
-            : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-        )}
-        onClick={() => setMobileMenuOpen(false)}
-      >
-        ElizaOS
-        <ArrowTopRightOnSquareIcon className="h-3 w-3" />
-      </a>
     </>
   );
 
   return (
-    <header className="absolute top-0 left-0 right-0 z-10 ">
+    <header className="fixed top-0 left-0 right-0 z-10 bg-white dark:bg-black">
       <nav className="px-4 lg:px-6" aria-label="Global">
         <div className="flex items-center justify-between py-4">
           <div className="flex">
@@ -184,11 +115,12 @@ export function Header() {
             <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
               <Button
                 color="orange"
-                href="https://www.daos.fun/HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzXbB8n4V98jwC"
+                href="https://eliza.gg/discord"
+                target="_blank"
                 className="w-full justify-center text-base"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Become Partner
+                Join Discord
               </Button>
             </div>
           </div>

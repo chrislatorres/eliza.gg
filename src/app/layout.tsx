@@ -50,13 +50,13 @@ export default function RootLayout({
         <body className="min-h-dvh antialiased bg-white text-black scheme-light dark:bg-black dark:text-white dark:scheme-dark selection:!bg-[#fff0dd] dark:selection:!bg-[#3d2b15] overscroll-none">
           <div className="flex min-h-dvh w-full flex-col grow">
             <div className="flex grow flex-col size-full min-h-dvh">
-              <Header />
               <ThemeProvider
                 attribute="class"
                 defaultTheme="system"
                 enableSystem
                 disableTransitionOnChange
               >
+                <Header />
                 {children}
               </ThemeProvider>
             </div>

@@ -3,7 +3,7 @@ import clsx from "clsx";
 
 const examplePrompts: string[] = [
   "What is Eliza?",
-  "What is ai16z?",
+  "What is an agent?",
   "How to create an agent",
 ];
 

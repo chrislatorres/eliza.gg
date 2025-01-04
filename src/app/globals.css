@@ -1,23 +1,9 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-:root {
-  /* Your default theme */
-  --background: white;
-  --foreground: black;
-}
-
-[data-theme="dark"] {
-  --background: black;
-  --foreground: white;
-}
-
 .prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
   @apply !px-0 !py-0;
 }
-/* .prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-  @apply !mb-0;
-} */
 
 .prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
   @apply !bg-transparent;

@@ -110,7 +110,7 @@ export const Chat = () => {
           />
         </div>
       </div>
-      <div className="fixed inset-x-0 bottom-0 bg-gradient-to-t from-white dark:from-black from-50% to-transparent pb-6 pt-8">
+      <div className="fixed inset-x-0 bottom-0 bg-white dark:bg-black pb-4 pt-0.5">
         <div className="max-w-3xl mx-auto px-4 md:px-0">
           <TextareaWithActions {...textareaProps} />
         </div>

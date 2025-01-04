@@ -2,7 +2,7 @@
 
 import { ExamplePrompts } from "@/components/app/example-prompts";
 import { Button } from "@/components/ui/button";
-import { ArrowRightIcon } from "@heroicons/react/24/outline";
+import { ArrowUpIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -114,7 +114,7 @@ export const LandingTextarea = () => {
                 {isLoading ? (
                   <Loader2 className="h-3 w-3 animate-spin" />
                 ) : (
-                  <ArrowRightIcon className="!h-3 !w-3 !shrink-0" />
+                  <ArrowUpIcon className="!h-3 !w-3 !shrink-0" />
                 )}
               </Button>
             </div>

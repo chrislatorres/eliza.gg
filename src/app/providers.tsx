@@ -1,6 +1,9 @@
 "use client";
 
+import { ClerkProvider } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
 import { fal } from "@fal-ai/client";
+import { useTheme } from "next-themes";
 import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
 
@@ -17,5 +20,15 @@ if (typeof window !== "undefined") {
 }
 
 export function Providers({ children }) {
-  return <PostHogProvider client={posthog}>{children}</PostHogProvider>;
+  const { resolvedTheme } = useTheme();
+
+  return (
+    <ClerkProvider
+      appearance={{
+        baseTheme: resolvedTheme === "dark" ? dark : undefined,
+      }}
+    >
+      <PostHogProvider client={posthog}>{children}</PostHogProvider>
+    </ClerkProvider>
+  );
 }
