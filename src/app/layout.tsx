@@ -46,26 +46,26 @@ export default function RootLayout({
 }>) {
   return (
     <html suppressHydrationWarning lang="en" className={inter.className}>
-      <Providers>
-        <body className="min-h-dvh antialiased bg-white text-black scheme-light dark:bg-black dark:text-white dark:scheme-dark selection:!bg-[#fff0dd] dark:selection:!bg-[#3d2b15] overscroll-none">
-          <div className="flex min-h-dvh w-full flex-col grow">
-            <div className="flex grow flex-col size-full min-h-dvh">
-              <ThemeProvider
-                attribute="class"
-                defaultTheme="system"
-                enableSystem
-                disableTransitionOnChange
-              >
+      <body className="min-h-dvh antialiased bg-white text-black scheme-light dark:bg-black dark:text-white dark:scheme-dark selection:!bg-[#fff0dd] dark:selection:!bg-[#3d2b15] overscroll-none">
+        <div className="flex min-h-dvh w-full flex-col grow">
+          <div className="flex grow flex-col size-full min-h-dvh">
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <Providers>
                 <Header />
                 {children}
-              </ThemeProvider>
-            </div>
+              </Providers>
+            </ThemeProvider>
           </div>
-          <ProgressBar />
-          <Toaster />
-          <Analytics />
-        </body>
-      </Providers>
+        </div>
+        <ProgressBar />
+        <Toaster />
+        <Analytics />
+      </body>
     </html>
   );
 }
