@@ -15,13 +15,17 @@
     "@clerk/nextjs": "^6.9.6",
     "@clerk/themes": "^2.2.3",
     "@codemirror/autocomplete": "^6.18.3",
+    "@codemirror/commands": "^6.7.1",
     "@codemirror/lang-css": "^6.3.1",
     "@codemirror/lang-html": "^6.4.9",
     "@codemirror/lang-javascript": "^6.2.2",
     "@codemirror/lang-json": "^6.0.1",
     "@codemirror/lang-markdown": "^6.3.1",
     "@codemirror/lang-sql": "^6.8.0",
+    "@codemirror/language": "^6.10.8",
     "@codemirror/legacy-modes": "^6.4.2",
+    "@codemirror/lint": "^6.8.4",
+    "@codemirror/search": "^6.5.8",
     "@codemirror/state": "^6.5.0",
     "@codemirror/view": "^6.35.3",
     "@coinbase/cdp-langchain": "^0.0.9",
@@ -69,7 +73,8 @@
     "sonner": "^1.7.1",
     "swr": "^2.3.0",
     "viem": "^2.21.55",
-    "voyageai": "^0.0.3-1"
+    "voyageai": "^0.0.3-1",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.15",
