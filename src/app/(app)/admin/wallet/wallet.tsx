@@ -2,10 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { CheckIcon, ClipboardDocumentIcon } from "@heroicons/react/24/outline";
-import { PublicKey } from "@solana/web3.js";
-import { useState } from "react";
-import useSWR, { mutate } from "swr";
-import { initiateUSDCTransfer } from "./actions";
+import { getAssociatedTokenAddress } from "@solana/spl-token";
+import { Connection, PublicKey } from "@solana/web3.js";
+import { useEffect, useState } from "react";
+import useSWR from "swr";
+import type { Token } from "./types";
 
 async function copyToClipboard(text: string): Promise<boolean> {
   try {
@@ -21,7 +22,6 @@ const fetcher = async (url: string) => {
   const res = await fetch(url);
   if (!res.ok) {
     const error = new Error("An error occurred while fetching the data.");
-    // Add extra info to the error object
     const data = await res.json();
     (error as any).status = res.status;
     (error as any).info = data;
@@ -30,101 +30,166 @@ const fetcher = async (url: string) => {
   return res.json();
 };
 
-export function WalletDetails() {
-  const [walletAddress, setWalletAddress] = useState<string>(
-    "CKEyMkc5izAZmuYWYF5aCpUY26BMDodx2wy97jwy33m2"
-  );
-  const [recipientAddress, setRecipientAddress] = useState("");
-  const [amount, setAmount] = useState("");
-  const [transferError, setTransferError] = useState<string | null>(null);
-  const [transferStatus, setTransferStatus] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-  const [solscanUrl, setSolscanUrl] = useState<string | null>(null);
+interface Allocation {
+  id: string;
+  githubUsername: string;
+  tokenSymbol: string;
+  amount: number;
+  claimed: boolean;
+  claimedAt: string | null;
+  claimTransaction: string | null;
+}
 
-  const { data, error: balanceError } = useSWR(
+const TOKENS: Token[] = [
+  {
+    symbol: "AI16Z",
+    mint: "HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzXbB8n4V98jwC",
+    decimals: 9,
+    icon: "https://assets.coingecko.com/coins/images/51090/standard/AI16Z.jpg",
+    balance: null,
+  },
+];
+
+export function WalletDetails() {
+  const [walletAddress] = useState<string>(
+    "HXUCCS91dKLkFSBBVN61spjZYMi6VLGmE6qxMyqXURQK"
+  );
+  const [copied, setCopied] = useState(false);
+  const [allocationSuccess, setAllocationSuccess] = useState(false);
+  const [selectedToken] = useState<Token>(TOKENS[0]);
+  const [allocations, setAllocations] = useState<Allocation[]>([]);
+  const [solBalance, setSolBalance] = useState<number | null>(null);
+  const [solPrice, setSolPrice] = useState<number | null>(null);
+  const [ai16zBalance, setAi16zBalance] = useState<number | null>(null);
+  const [ai16zPrice, setAi16zPrice] = useState<number | null>(null);
+  const [githubUsername, setGithubUsername] = useState("");
+  const [amount, setAmount] = useState("");
+  const [isAllocating, setIsAllocating] = useState(false);
+
+  const { data: balance, error: balanceError } = useSWR(
     walletAddress ? `/api/admin/wallet?address=${walletAddress}` : null,
+    fetcher
+  );
+
+  const { data: allocationData } = useSWR<Allocation[]>(
+    "/api/admin/allocations",
     fetcher,
     {
       refreshInterval: 10000,
     }
   );
 
-  // Handle different types of errors
-  const errorMessage = balanceError?.info?.error || "Failed to fetch balance";
-  const isUnauthorized = balanceError?.status === 401;
-  const isForbidden = balanceError?.status === 403;
+  useEffect(() => {
+    if (allocationData) {
+      setAllocations(allocationData);
+    }
+  }, [allocationData]);
 
   const handleCopy = async () => {
     const success = await copyToClipboard(walletAddress);
     if (success) {
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
-  const handleTransfer = async () => {
+  const handleAllocateTokens = async (
+    githubUsername: string,
+    amount: number
+  ) => {
     try {
-      setTransferError(null);
-      setTransferStatus("Preparing transaction...");
-      setSolscanUrl(null); // Reset Solscan URL
+      const response = await fetch("/api/admin/allocations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          githubUsername,
+          tokenSymbol: selectedToken.symbol,
+          amount,
+        }),
+      });
 
-      // Validate input
-      if (!recipientAddress || !amount) {
-        throw new Error("Please fill in all fields");
+      if (!response.ok) {
+        throw new Error("Failed to allocate tokens");
       }
 
-      const amountNum = parseFloat(amount);
-      if (isNaN(amountNum) || amountNum <= 0) {
-        throw new Error("Please enter a valid amount");
+      // Refresh allocations
+      const newAllocation = await response.json();
+      setAllocations((prev) => [newAllocation, ...prev]);
+
+      setAllocationSuccess(true);
+      setTimeout(() => setAllocationSuccess(false), 3000);
+    } catch (error) {
+      console.error("Failed to allocate tokens:", error);
+      throw error;
+    }
+  };
+
+  const fetchBalances = async () => {
+    try {
+      const connection = new Connection(
+        "https://red-weathered-theorem.solana-mainnet.quiknode.pro/bcebff344bdf1b96bb92ffd2a9fc1281ad16d7f3"
+      );
+      const senderPublicKey = new PublicKey(walletAddress);
+
+      // Fetch SOL balance
+      const solBalance = await connection.getBalance(senderPublicKey);
+      setSolBalance(solBalance / 1e9);
+
+      // Fetch prices for both SOL and AI16Z
+      const priceResponse = await fetch("/api/prices?ids=solana,ai16z");
+      if (!priceResponse.ok) {
+        throw new Error("Failed to fetch token prices");
       }
+      const priceData = await priceResponse.json();
+      setSolPrice(priceData?.solana?.usd || null);
+      setAi16zPrice(priceData?.ai16z?.usd || null);
 
-      // Validate that recipient address is a valid Solana address
-      try {
-        new PublicKey(recipientAddress);
-      } catch (e) {
-        throw new Error("Invalid recipient address");
-      }
-
-      // Validate sufficient balance
-      const currentBalance = parseFloat(data?.balance || "0");
-      if (amountNum > currentBalance) {
-        throw new Error("Insufficient balance");
-      }
-
-      setTransferStatus("Sending transaction...");
-
-      const result = await initiateUSDCTransfer(
-        walletAddress,
-        recipientAddress,
-        amountNum
+      // Fetch AI16Z balance
+      const AI16Z_MINT = new PublicKey(
+        "HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzXbB8n4V98jwC"
+      );
+      const ai16zATA = await getAssociatedTokenAddress(
+        AI16Z_MINT,
+        senderPublicKey
       );
 
-      if (result.status === "success") {
-        setTransferStatus("Transaction completed successfully!");
-        setSolscanUrl(result.solscanUrl);
-        setRecipientAddress("");
-        setAmount("");
-
-        // Reset transfer status after a delay
-        setTimeout(() => {
-          setTransferStatus(null);
-        }, 5000);
-
-        // Trigger balance refresh
-        await mutate(`/api/admin/wallet?address=${walletAddress}`);
-      } else if (result.message) {
-        setTransferStatus(result.message);
+      try {
+        const accountInfo = await connection.getAccountInfo(ai16zATA);
+        if (accountInfo) {
+          const ai16zAccountInfo = await connection.getTokenAccountBalance(
+            ai16zATA
+          );
+          setAi16zBalance(Number(ai16zAccountInfo.value.uiAmount));
+        } else {
+          const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+            senderPublicKey,
+            { mint: AI16Z_MINT }
+          );
+          if (tokenAccounts.value.length > 0) {
+            const balance =
+              tokenAccounts.value[0].account.data.parsed.info.tokenAmount
+                .uiAmount;
+            setAi16zBalance(Number(balance));
+          } else {
+            setAi16zBalance(0);
+          }
+        }
+      } catch (e) {
+        console.error("Error fetching AI16Z balance:", e);
+        setAi16zBalance(0);
       }
     } catch (error) {
-      console.error("Transfer error:", error);
-      setTransferError(
-        error instanceof Error ? error.message : "Transfer failed"
-      );
-      setTransferStatus(null);
+      console.error("Error fetching balances:", error);
     }
   };
 
-  if (isUnauthorized) {
+  useEffect(() => {
+    fetchBalances();
+  }, [walletAddress, balance]);
+
+  if (balanceError?.status === 401) {
     return (
       <div className="max-w-2xl mx-auto p-6">
         <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded">
@@ -134,7 +199,7 @@ export function WalletDetails() {
     );
   }
 
-  if (isForbidden) {
+  if (balanceError?.status === 403) {
     return (
       <div className="max-w-2xl mx-auto p-6">
         <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded">
@@ -145,22 +210,13 @@ export function WalletDetails() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6 text-zinc-900 dark:text-zinc-100">
-        Solana MPC Wallet
-      </h1>
-
-      {balanceError && (
-        <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded mb-4">
-          {"Failed to fetch balance"}
-        </div>
-      )}
-
-      <div className="space-y-4">
+    <div className="max-w-6xl mx-auto p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Left column - Wallet details and allocation form */}
         <div className="space-y-4">
           <div className="p-4 bg-zinc-100 dark:bg-zinc-800/50 rounded border border-zinc-200 dark:border-zinc-700">
             <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
-              Wallet Address:
+              Treasury Wallet:
             </h3>
             <div className="flex items-center gap-2">
               <p className="break-all text-zinc-700 dark:text-zinc-300">
@@ -177,87 +233,215 @@ export function WalletDetails() {
           </div>
 
           <div className="p-4 bg-zinc-100 dark:bg-zinc-800/50 rounded border border-zinc-200 dark:border-zinc-700">
-            <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
-              Balance:
+            <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-3">
+              Balances
             </h3>
-            <p className="text-zinc-700 dark:text-zinc-300">
-              {data ? `${data.balance} USDC` : "Loading..."}
-            </p>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <img
+                    src="https://assets.coingecko.com/coins/images/4128/small/solana.png"
+                    alt="Solana"
+                    className="w-8 h-8"
+                  />
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                        Solana
+                      </span>
+                    </div>
+                    <div className="text-sm text-zinc-500 dark:text-zinc-400">
+                      {solBalance !== null
+                        ? `${solBalance.toFixed(6)} SOL`
+                        : "Loading..."}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-medium text-zinc-900 dark:text-zinc-100">
+                    {solBalance !== null && solPrice !== null
+                      ? `$${(solBalance * solPrice).toFixed(2)}`
+                      : "..."}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <img
+                    src="https://assets.coingecko.com/coins/images/6319/small/USD_Coin_icon.png"
+                    alt="USDC"
+                    className="w-8 h-8"
+                  />
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                        USDC
+                      </span>
+                    </div>
+                    <div className="text-sm text-zinc-500 dark:text-zinc-400">
+                      {balance ? `${balance.balance} USDC` : "Loading..."}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-medium text-zinc-900 dark:text-zinc-100">
+                    ${balance ? Number(balance.balance).toFixed(2) : "0.00"}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <img
+                    src="https://assets.coingecko.com/coins/images/51090/standard/AI16Z.jpg"
+                    alt="AI16Z"
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                        AI16Z
+                      </span>
+                    </div>
+                    <div className="text-sm text-zinc-500 dark:text-zinc-400">
+                      {ai16zBalance !== null
+                        ? `${ai16zBalance.toLocaleString()} AI16Z`
+                        : "Loading..."}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-medium text-zinc-900 dark:text-zinc-100">
+                    {ai16zBalance !== null && ai16zPrice !== null
+                      ? `$${(ai16zBalance * ai16zPrice).toFixed(2)}`
+                      : "-"}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 bg-zinc-100 dark:bg-zinc-800/50 rounded border border-zinc-200 dark:border-zinc-700">
+            <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-3">
+              Allocate Tokens
+            </h3>
+            <form
+              className="space-y-4"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setIsAllocating(true);
+                try {
+                  await handleAllocateTokens(githubUsername, Number(amount));
+                  setGithubUsername("");
+                  setAmount("");
+                } catch (error) {
+                  console.error("Failed to allocate:", error);
+                } finally {
+                  setIsAllocating(false);
+                }
+              }}
+            >
+              <div>
+                <label
+                  htmlFor="github-username"
+                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1"
+                >
+                  GitHub Username
+                </label>
+                <input
+                  id="github-username"
+                  type="text"
+                  value={githubUsername}
+                  onChange={(e) => setGithubUsername(e.target.value)}
+                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="amount"
+                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1"
+                >
+                  Amount ({selectedToken.symbol})
+                </label>
+                <input
+                  id="amount"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
+                  required
+                />
+              </div>
+
+              <Button type="submit" className="w-full" disabled={isAllocating}>
+                {isAllocating ? "Allocating..." : "Allocate Tokens"}
+              </Button>
+            </form>
+
+            {allocationSuccess && (
+              <div className="mt-2 text-sm text-green-600 dark:text-green-400">
+                Tokens allocated successfully!
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="p-4 bg-zinc-100 dark:bg-zinc-800/50 rounded border border-zinc-200 dark:border-zinc-700">
-          <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
-            Send USDC
-          </h3>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                Recipient Address
-              </label>
-              <input
-                type="text"
-                value={recipientAddress}
-                onChange={(e) => setRecipientAddress(e.target.value)}
-                className="w-full p-2 border rounded bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700"
-                placeholder="Enter Solana address"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                Amount (USDC)
-              </label>
-              <input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="w-full p-2 border rounded bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700"
-                placeholder="0.00"
-                step="0.01"
-                min="0"
-              />
-            </div>
-
-            <Button
-              onClick={handleTransfer}
-              className="w-full"
-              disabled={!!transferStatus}
-            >
-              {transferStatus ? (
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  {transferStatus}
-                </div>
-              ) : (
-                "Send USDC"
-              )}
-            </Button>
-
-            {transferStatus && (
-              <div className="text-sm text-zinc-600 dark:text-zinc-400">
-                {transferStatus}
-              </div>
-            )}
-
-            {transferError && (
-              <div className="text-sm text-red-600 dark:text-red-400">
-                {transferError}
-              </div>
-            )}
-
-            {solscanUrl && (
-              <div className="text-sm text-zinc-600 dark:text-zinc-400">
-                <a
-                  href={solscanUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
+        {/* Right column - Allocations */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+            Token Allocations
+          </h2>
+          <div className="space-y-2">
+            {allocations.length === 0 ? (
+              <p className="text-zinc-500 dark:text-zinc-400">
+                No tokens allocated yet
+              </p>
+            ) : (
+              allocations.map((allocation) => (
+                <div
+                  key={allocation.id}
+                  className="p-4 bg-zinc-100 dark:bg-zinc-800/50 rounded border border-zinc-200 dark:border-zinc-700"
                 >
-                  View transaction on Solscan →
-                </a>
-              </div>
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                      <p className="font-medium text-zinc-900 dark:text-zinc-100">
+                        {allocation.amount} {allocation.tokenSymbol}
+                      </p>
+                      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                        Allocated to: {allocation.githubUsername}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      {allocation.claimed ? (
+                        <div>
+                          <span className="text-green-600 dark:text-green-400 text-sm">
+                            Claimed
+                          </span>
+                          {allocation.claimTransaction && (
+                            <a
+                              href={`https://solscan.io/tx/${allocation.claimTransaction}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block text-blue-500 hover:text-blue-600 dark:text-blue-400 text-sm"
+                            >
+                              View on Solscan →
+                            </a>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-yellow-600 dark:text-yellow-400 text-sm">
+                          Unclaimed
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))
             )}
           </div>
         </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogBody, DialogTitle } from "@/components/ui/dialog";
 import {
   Table,
@@ -43,16 +44,56 @@ export function PartnershipsRequests({
     partnership: null,
   });
 
+  const generateCsv = (partnerships: Partnership[]): string => {
+    const headers = [
+      "Name",
+      "Category",
+      "Interests",
+      "Contact Info",
+      "Created At",
+    ];
+    const rows = partnerships.map((p) =>
+      [p.name, p.category, p.interests, p.contactInfo, p["xata.createdAt"]]
+        .map((field) => `"${field?.replace(/"/g, '""')}"`)
+        .join(",")
+    );
+
+    return [headers.join(","), ...rows].join("\n");
+  };
+
+  const handleExportCsv = () => {
+    if (!partnerships) return;
+
+    const csv = generateCsv(partnerships);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `partnerships-${new Date().toISOString().split("T")[0]}.csv`
+    );
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <main className="flex flex-col min-h-dvh pt-16">
       <div className="flex-1 relative mx-auto w-full max-w-7xl px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
-            Partnership Requests
-          </h1>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-            A list of all partnership requests submitted to the platform
-          </p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+              Partnership Requests
+            </h1>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              A list of all {partnerships?.length} partnership requests
+              submitted to the platform
+            </p>
+          </div>
+          <Button onClick={handleExportCsv}>Export CSV</Button>
         </div>
 
         <Table>

@@ -46,6 +46,39 @@
           "type": "text"
         }
       ]
+    },
+    {
+      "name": "token_allocations",
+      "columns": [
+        {
+          "name": "githubUsername",
+          "type": "text"
+        },
+        {
+          "name": "tokenSymbol",
+          "type": "text"
+        },
+        {
+          "name": "amount",
+          "type": "float"
+        },
+        {
+          "name": "allocatedBy",
+          "type": "text"
+        },
+        {
+          "name": "claimed",
+          "type": "bool"
+        },
+        {
+          "name": "claimedAt",
+          "type": "datetime"
+        },
+        {
+          "name": "claimTransaction",
+          "type": "text"
+        }
+      ]
     }
   ]
 }

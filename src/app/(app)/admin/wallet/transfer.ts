@@ -13,10 +13,14 @@ import {
   VersionedTransaction,
 } from "@solana/web3.js";
 import bs58 from "bs58";
+import { getWalletKeypair } from "./keys";
 
 // USDC token mint address (Solana mainnet)
 const USDC_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
-const SOLANA_RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`;
+const SOLANA_RPC_URL =
+  "https://red-weathered-theorem.solana-mainnet.quiknode.pro/bcebff344bdf1b96bb92ffd2a9fc1281ad16d7f3";
+const SOLANA_WS_URL =
+  "wss://red-weathered-theorem.solana-mainnet.quiknode.pro/bcebff344bdf1b96bb92ffd2a9fc1281ad16d7f3";
 
 export async function createUSDCTransferTransaction(
   senderAddress: string,
@@ -113,25 +117,18 @@ export async function createUSDCTransferTransaction(
   // Build final transaction with optimized compute units
   const instructions = [];
 
-  // Get recommended priority fee using Helius API
+  // Get recommended priority fee using QuickNode API
   const priorityFeeResponse = await fetch(SOLANA_RPC_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       jsonrpc: "2.0",
       id: "1",
-      method: "getPriorityFeeEstimate",
-      params: [
-        {
-          transaction: bs58.encode(testTransaction.serialize()),
-          options: {
-            includeAllPriorityFeeLevels: true,
-            // Use ultra-small lookback for most recent fees
-            lookbackSlots: 2,
-            evaluateEmptySlotAsZero: false,
-          },
-        },
-      ],
+      method: "qn_estimatePriorityFees",
+      params: {
+        last_n_blocks: 2,
+        api_version: 1,
+      },
     }),
   });
 
@@ -141,63 +138,21 @@ export async function createUSDCTransferTransaction(
     throw new Error("Failed to estimate priority fee");
   }
 
-  // Use the priority fee levels to determine optimal fee
-  const priorityFeeLevels = priorityFeeData.result?.priorityFeeLevels;
-  let priorityFee = 2_000_000; // Double the default fallback for extreme cases
-  let networkLoad = 1;
+  // Use QuickNode's priority fee levels
+  const priorityFeeLevels = priorityFeeData.result?.per_compute_unit;
+  let priorityFee = 2_000_000; // Default fallback
 
   if (priorityFeeLevels) {
-    networkLoad = priorityFeeLevels.veryHigh / priorityFeeLevels.medium;
+    // Always use extreme priority fee for faster processing
+    priorityFee = Math.ceil(priorityFeeLevels.extreme * 1.5); // 50% higher than extreme
 
-    // Start with 5x unsafeMax as absolute base
-    priorityFee = Math.ceil(priorityFeeLevels.unsafeMax * 5);
-
-    // Simplified multiplier based on amount
-    const amountInUSD = amount;
-    let amountMultiplier = 10; // Start with 10x for all transactions
-
-    if (amountInUSD < 1) {
-      amountMultiplier = 25; // 25x for sub-dollar transactions
-    }
-
-    // Set absolute minimum fee floor
-    const minimumFee = Math.max(
-      Math.ceil(priorityFeeLevels.unsafeMax * amountMultiplier),
-      20_000_000 // 20M microlamports minimum
-    );
-
-    priorityFee = Math.max(priorityFee, minimumFee);
-
-    // Network congestion multiplier
-    const congestionMultiplier = networkLoad > 2 ? 3 : 2;
-    priorityFee = Math.ceil(priorityFee * congestionMultiplier);
-
-    // Final boost to ensure we're way above network average
-    const avgFee = (priorityFeeLevels.high + priorityFeeLevels.veryHigh) / 2;
-    priorityFee = Math.max(
-      priorityFee,
-      avgFee * 1000, // 1000x average network fee
-      priorityFeeLevels.unsafeMax * 10 // Minimum 10x unsafeMax
-    );
-
-    const microlamportsPerCU = priorityFee / computeUnits;
-    console.log("Fee metrics:", {
-      microlamportsPerCU,
-      totalFee: priorityFee,
-      computeUnits,
-      estimatedCostSOL: (priorityFee * computeUnits) / 1e9,
-      networkLoad,
-      unsafeMax: priorityFeeLevels.unsafeMax,
-      amountUSD: amountInUSD,
-      amountMultiplier,
-      congestionMultiplier,
-      avgNetworkFee: avgFee,
+    console.log("Priority fee metrics:", {
+      estimatedFee: priorityFee,
+      feeLevels: priorityFeeLevels,
     });
   }
 
-  console.log(
-    `Using priority fee: ${priorityFee} microlamports (Network load factor: ${networkLoad})`
-  );
+  console.log(`Using priority fee: ${priorityFee} microlamports`);
 
   // Add compute budget instructions at the very start
   instructions.unshift(
@@ -205,7 +160,7 @@ export async function createUSDCTransferTransaction(
       microLamports: priorityFee,
     }),
     ComputeBudgetProgram.setComputeUnitLimit({
-      units: Math.min(computeUnits, 150_000), // Further reduce compute units
+      units: 200_000, // Increased from 100_000
     })
   );
 
@@ -236,6 +191,38 @@ export async function createUSDCTransferTransaction(
 
   console.log(`Created ${instructions.length} instructions`);
 
+  // Get the wallet keypair
+  const walletKeypair = getWalletKeypair();
+
+  // Verify the sender address matches our keypair
+  if (walletKeypair.publicKey.toBase58() !== senderAddress) {
+    throw new Error("Sender address does not match wallet keypair");
+  }
+
+  // Calculate required SOL for rent and fees
+  const rentExemptBalance = await connection.getMinimumBalanceForRentExemption(
+    165
+  );
+  const senderBalance = await connection.getBalance(senderPublicKey);
+
+  // Estimate minimum SOL needed (rent + estimated fee)
+  const estimatedFee = 5000; // Base fee in lamports
+  const totalNeeded = !recipientAccountInfo
+    ? rentExemptBalance + estimatedFee
+    : estimatedFee;
+
+  if (senderBalance < totalNeeded) {
+    const neededSOL = totalNeeded / 1e9;
+    const currentSOL = senderBalance / 1e9;
+    throw new Error(
+      `Insufficient SOL balance for ${
+        !recipientAccountInfo ? "account creation and " : ""
+      }transaction fees. ` +
+        `Have ${currentSOL.toFixed(6)} SOL, need ${neededSOL.toFixed(6)} SOL`
+    );
+  }
+
+  // Create and sign the final transaction
   const message = new TransactionMessage({
     instructions,
     recentBlockhash: blockhash,
@@ -243,13 +230,12 @@ export async function createUSDCTransferTransaction(
   }).compileToV0Message();
 
   const transaction = new VersionedTransaction(message);
-  const serializedTx = bs58.encode(transaction.serialize());
 
-  console.log(`Transaction created and serialized successfully`);
+  // Sign the transaction with our keypair
+  transaction.sign([walletKeypair]);
 
   return {
-    serializedTx,
-    computeUnits,
-    priorityFee,
+    transaction,
+    serializedTx: bs58.encode(transaction.serialize()),
   };
 }

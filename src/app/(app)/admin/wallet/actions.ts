@@ -3,22 +3,15 @@
 import { isUserAdmin } from "@/lib/auth/admin";
 import { auth } from "@clerk/nextjs/server";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
-import {
-  Connection,
-  ParsedTransactionWithMeta,
-  PublicKey,
-  RpcResponseAndContext,
-  SignatureStatus,
-} from "@solana/web3.js";
-import {
-  getCrossmintTransactionStatus,
-  sendTransactionToCrossmint,
-} from "./crossmint";
+import { Connection, PublicKey } from "@solana/web3.js";
 import { createUSDCTransferTransaction } from "./transfer";
 
 // USDC token mint address (Solana mainnet)
 const USDC_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
-const SOLANA_RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`;
+const SOLANA_RPC_URL =
+  "https://red-weathered-theorem.solana-mainnet.quiknode.pro/bcebff344bdf1b96bb92ffd2a9fc1281ad16d7f3";
+const SOLANA_WS_URL =
+  "wss://red-weathered-theorem.solana-mainnet.quiknode.pro/bcebff344bdf1b96bb92ffd2a9fc1281ad16d7f3";
 const SOLSCAN_BASE_URL = "https://solscan.io/tx";
 
 export async function getWalletBalance(walletAddress: string) {
@@ -42,6 +35,16 @@ export async function getWalletBalance(walletAddress: string) {
       USDC_MINT,
       walletPublicKey
     );
+
+    // Check if token account exists
+    const accountInfo = await connection.getAccountInfo(tokenAccount);
+
+    if (!accountInfo) {
+      return {
+        amount: "0",
+        decimals: 6,
+      };
+    }
 
     // Get token account balance
     const balance = await connection.getTokenAccountBalance(tokenAccount);
@@ -80,160 +83,93 @@ export async function initiateUSDCTransfer(
   }
 
   try {
-    const { serializedTx } = await createUSDCTransferTransaction(
+    const { transaction } = await createUSDCTransferTransaction(
       senderAddress,
       recipientAddress,
       amount
     );
 
-    console.log("Transaction created successfully, sending to Crossmint");
-
-    // Send to Crossmint for signing and broadcasting
-    const initialResponse = await sendTransactionToCrossmint(
-      senderAddress,
-      serializedTx
-    );
-
-    console.log(`Initial Crossmint response:`, initialResponse);
-
-    // Poll for transaction status
-    let status = initialResponse;
-    let attempts = 0;
-    const maxAttempts = 90;
-    const pollInterval = 100; // Poll every 100ms
-    const wsUrl = `wss://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`;
-
-    // Create both HTTP and WebSocket connections
+    // Create connection with commitment
     const connection = new Connection(SOLANA_RPC_URL, {
       commitment: "confirmed",
-      wsEndpoint: wsUrl,
+      wsEndpoint: SOLANA_WS_URL,
     });
 
-    // Initial delay to allow Crossmint to process
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Create a promise that resolves when confirmation is received via WebSocket
-    const wsConfirmationPromise = new Promise<string | null>((resolve) => {
-      if (!status.onChain?.txId) {
-        resolve(null);
-        return;
-      }
-
-      try {
-        connection.onSignature(
-          status.onChain.txId,
-          (result, context) => {
-            console.log("WebSocket confirmation received:", {
-              result,
-              context,
-            });
-            if (result.err) {
-              console.error("Transaction failed:", result.err);
-              resolve(null);
-            } else {
-              resolve(status.onChain?.txId || null);
-            }
-          },
-          "confirmed"
-        );
-      } catch (error) {
-        console.error("WebSocket subscription error:", error);
-        resolve(null);
-      }
+    // Send transaction with proper options
+    const signature = await connection.sendTransaction(transaction, {
+      skipPreflight: false,
+      preflightCommitment: "confirmed",
+      maxRetries: 3,
     });
 
-    while (attempts < maxAttempts) {
-      if (status.status === "failed") {
-        console.error("Transaction failed:", status);
-        throw new Error(status.error || "Transaction failed");
-      }
+    console.log(`Transaction sent with signature: ${signature}`);
 
-      // Check Crossmint status first
-      const crossmintStatus = await getCrossmintTransactionStatus(
-        senderAddress,
-        initialResponse.id
+    // Create WebSocket subscription for confirmation
+    const confirmationPromise = new Promise<string>((resolve, reject) => {
+      let timeout: ReturnType<typeof setTimeout>;
+
+      const wsSubscription = connection.onSignature(
+        signature,
+        (result, context) => {
+          clearTimeout(timeout);
+          console.log("Transaction confirmation received:", {
+            result,
+            context,
+          });
+
+          if (result.err) {
+            reject(new Error(`Transaction failed: ${result.err}`));
+          } else {
+            resolve(signature);
+          }
+        },
+        "confirmed"
       );
-      status = crossmintStatus;
 
-      // If transaction is on chain, check for confirmation
-      if (status.onChain?.txId) {
-        try {
-          // Race between WebSocket and RPC confirmation
-          const confirmation = await Promise.race([
-            wsConfirmationPromise,
-            Promise.all([
-              connection.getSignatureStatus(status.onChain.txId),
-              connection.getParsedTransaction(status.onChain.txId, {
-                maxSupportedTransactionVersion: 0,
-                commitment: "confirmed",
-              }),
-            ]) as Promise<
-              [
-                RpcResponseAndContext<SignatureStatus>,
-                ParsedTransactionWithMeta
-              ]
-            >,
-          ]);
+      // Set timeout for confirmation
+      timeout = setTimeout(() => {
+        connection.removeSignatureListener(wsSubscription);
+        reject(new Error("Transaction confirmation timeout"));
+      }, 30000); // 30 second timeout
+    });
 
-          // If we got a valid signature from WebSocket
-          if (typeof confirmation === "string" && confirmation) {
-            return {
-              signature: confirmation,
-              solscanUrl: `${SOLSCAN_BASE_URL}/${confirmation}`,
-              status: "success",
-            };
-          }
+    // Wait for confirmation
+    const confirmedSignature = await confirmationPromise;
 
-          // If it's an array, it's the RPC confirmation
-          if (Array.isArray(confirmation)) {
-            const [signatureStatus, parsedTx] = confirmation;
-            if (
-              signatureStatus.value?.confirmationStatus ||
-              parsedTx ||
-              signatureStatus.value?.confirmations > 0
-            ) {
-              return {
-                signature: status.onChain.txId,
-                solscanUrl: `${SOLSCAN_BASE_URL}/${status.onChain.txId}`,
-                status: "success",
-              };
-            }
-          }
-        } catch (error) {
-          console.warn("Error checking confirmation:", error);
-        }
-      }
-
-      attempts++;
-      await new Promise((resolve) => setTimeout(resolve, pollInterval));
-    }
-
-    // If we have a transaction ID but it's not confirmed yet, return pending
-    if (status.onChain?.txId) {
-      return {
-        signature: status.onChain.txId,
-        solscanUrl: `${SOLSCAN_BASE_URL}/${status.onChain.txId}`,
-        status: "pending",
-        message:
-          "Transaction submitted but confirmation is taking longer than usual. You can track it on Solscan.",
-      };
-    }
-
-    console.log("Transaction polling timed out");
     return {
-      signature: null,
-      solscanUrl: null,
-      status: "pending",
-      message:
-        "Transaction submitted but still processing. Please check your wallet for confirmation.",
+      signature: confirmedSignature,
+      solscanUrl: `${SOLSCAN_BASE_URL}/${confirmedSignature}`,
+      status: "success",
     };
   } catch (error) {
-    console.error("Transfer error:", {
-      error,
-      sender: senderAddress,
-      recipient: recipientAddress,
-      amount,
-    });
-    throw new Error(error instanceof Error ? error.message : "Transfer failed");
+    console.error("Transfer error:", error);
+    throw error;
   }
+}
+
+export async function initiateAI16ZTransfer(
+  senderAddress: string,
+  recipientAddress: string,
+  amount: number
+): Promise<{ signature: string; solscanUrl: string }> {
+  const response = await fetch("/api/admin/wallet/transfer", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      senderAddress,
+      recipientAddress,
+      amount,
+      tokenMint: "Ai16Z2tPz1kxgvHsDpFr6mPzMJGqPxm9pTYrTQNXVRa4",
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Failed to transfer AI16Z");
+  }
+
+  const result = await response.json();
+  return result;
 }

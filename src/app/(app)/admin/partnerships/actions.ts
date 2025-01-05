@@ -27,7 +27,7 @@ export const getPartnerships = unstable_cache(
         "status",
         "xata.createdAt",
       ])
-      .getMany();
+      .getAll();
 
     return partnerships.map((p) => ({
       id: p.id,
