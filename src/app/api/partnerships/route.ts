@@ -1,16 +1,16 @@
 import { getXataClient } from "@/xata";
 
-const xata = getXataClient();
-
 export async function POST(req: Request) {
   const { name, category, interests, contactInfo, source } = await req.json();
   try {
     if (!name || !category || !interests || !contactInfo) {
-      return {
-        error: "All fields are required",
-      };
+      return Response.json(
+        { error: "All fields are required" },
+        { status: 400 }
+      );
     }
 
+    const xata = getXataClient();
     const record = await xata.db.partnerships.create({
       name,
       category,
@@ -19,11 +19,17 @@ export async function POST(req: Request) {
       source,
     });
 
-    return { success: true, data: record.toSerializable() };
+    return Response.json(
+      { success: true, data: record.toSerializable() },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error submitting partnership:", error);
-    return {
-      error: "Failed to submit partnership request",
-    };
+    return Response.json(
+      {
+        error: "Failed to submit partnership request",
+      },
+      { status: 500 }
+    );
   }
 }
