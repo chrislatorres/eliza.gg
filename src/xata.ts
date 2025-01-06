@@ -15,6 +15,7 @@ const tables = [
       { name: "interests", type: "text", notNull: true, defaultValue: "" },
       { name: "contactInfo", type: "text", notNull: true, defaultValue: "" },
       { name: "status", type: "text", defaultValue: "pending" },
+      { name: "source", type: "text" },
     ],
   },
   {

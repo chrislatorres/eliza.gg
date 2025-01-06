@@ -31,6 +31,10 @@
           "name": "status",
           "type": "text",
           "defaultValue": "pending"
+        },
+        {
+          "name": "source",
+          "type": "text"
         }
       ]
     },
