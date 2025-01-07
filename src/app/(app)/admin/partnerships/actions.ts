@@ -11,6 +11,7 @@ export type Partnership = {
   category: string;
   interests: string;
   contactInfo: string;
+  telegram_username?: string;
   status: string;
   "xata.createdAt": string;
 };
@@ -24,6 +25,7 @@ export const getPartnerships = unstable_cache(
         "category",
         "interests",
         "contactInfo",
+        "telegram_username",
         "status",
         "xata.createdAt",
       ])
@@ -35,13 +37,14 @@ export const getPartnerships = unstable_cache(
       category: p.category,
       interests: p.interests,
       contactInfo: p.contactInfo,
+      telegram_username: p.telegram_username,
       status: p.status ?? "pending",
       "xata.createdAt": p.xata.createdAt.toString(),
     }));
   },
   ["partnerships"],
   {
-    revalidate: 30, // Cache for 30 seconds
+    revalidate: 30,
     tags: ["partnerships"],
   }
 );

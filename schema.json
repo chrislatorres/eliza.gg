@@ -28,6 +28,10 @@
           "defaultValue": ""
         },
         {
+          "name": "telegram_username",
+          "type": "text"
+        },
+        {
           "name": "status",
           "type": "text",
           "defaultValue": "pending"

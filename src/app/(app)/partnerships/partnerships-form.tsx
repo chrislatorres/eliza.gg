@@ -106,6 +106,15 @@ export function PartnershipsForm() {
                 />
               </Field>
 
+              <Field>
+                <Label htmlFor="telegram_username">Telegram Username</Label>
+                <Input
+                  id="telegram_username"
+                  name="telegram_username"
+                  placeholder="@username"
+                />
+              </Field>
+
               <Button type="submit" color="orange" className="w-full !py-2">
                 Submit Partnership Request
               </Button>

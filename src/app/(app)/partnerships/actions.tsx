@@ -18,6 +18,7 @@ export async function submitPartnership(
     const category = formData.get("category")?.toString();
     const interests = formData.get("interests")?.toString();
     const contactInfo = formData.get("contactInfo")?.toString();
+    const telegram_username = formData.get("telegram_username")?.toString();
 
     if (!name || !category || !interests || !contactInfo) {
       return {
@@ -30,6 +31,7 @@ export async function submitPartnership(
       category,
       interests,
       contactInfo,
+      telegram_username,
       status: "pending",
     });
 

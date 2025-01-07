@@ -16,6 +16,7 @@ const tables = [
       { name: "contactInfo", type: "text", notNull: true, defaultValue: "" },
       { name: "status", type: "text", defaultValue: "pending" },
       { name: "source", type: "text" },
+      { name: "telegram_username", type: "text" },
     ],
   },
   {

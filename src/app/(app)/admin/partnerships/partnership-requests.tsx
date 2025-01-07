@@ -50,10 +50,18 @@ export function PartnershipsRequests({
       "Category",
       "Interests",
       "Contact Info",
+      "Telegram Username",
       "Created At",
     ];
     const rows = partnerships.map((p) =>
-      [p.name, p.category, p.interests, p.contactInfo, p["xata.createdAt"]]
+      [
+        p.name,
+        p.category,
+        p.interests,
+        p.contactInfo,
+        p.telegram_username || "",
+        p["xata.createdAt"],
+      ]
         .map((field) => `"${field?.replace(/"/g, '""')}"`)
         .join(",")
     );
@@ -103,6 +111,7 @@ export function PartnershipsRequests({
               <TableHeader>Category</TableHeader>
               <TableHeader>Interests</TableHeader>
               <TableHeader>Contact</TableHeader>
+              <TableHeader>Telegram</TableHeader>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -131,6 +140,12 @@ export function PartnershipsRequests({
                   onClick={() => setDialog({ isOpen: true, partnership })}
                 >
                   {partnership.contactInfo}
+                </TableCell>
+                <TableCell
+                  className="max-w-[150px] truncate cursor-pointer hover:text-orange-500"
+                  onClick={() => setDialog({ isOpen: true, partnership })}
+                >
+                  {partnership.telegram_username || "-"}
                 </TableCell>
               </TableRow>
             ))}
@@ -178,6 +193,14 @@ export function PartnershipsRequests({
                     </h3>
                     <p className="mt-1 text-zinc-600 dark:text-zinc-400">
                       {dialog.partnership.contactInfo}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-zinc-900 dark:text-zinc-100">
+                      Telegram Username
+                    </h3>
+                    <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+                      {dialog.partnership.telegram_username || "Not provided"}
                     </p>
                   </div>
                 </div>
