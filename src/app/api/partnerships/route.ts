@@ -4,6 +4,10 @@ import { getXataClient } from "@/xata";
 const allowedOrigins = [
   "https://eliza-studios-static-git-contact-lgds.vercel.app",
   "https://www.elizastudios.ai",
+  "https://elizastudios.ai",
+  "https://www.elizalabs.ai",
+  "https://elizalabs.ai",
+  "https://eliza-labs-static.vercel.app",
 ];
 
 // Handle OPTIONS request for CORS preflight
