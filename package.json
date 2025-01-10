@@ -1,7 +1,7 @@
 {
   "name": "eliza",
   "version": "0.0.1",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
