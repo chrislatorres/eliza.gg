@@ -42,6 +42,11 @@ const nextConfig: NextConfig = {
         destination: "https://elizaos.github.io/website/",
         permanent: false,
       },
+      {
+        source: "/hat",
+        destination: "https://elizaos.github.io/hat/",
+        permanent: false,
+      },
     ];
   },
   async rewrites() {
