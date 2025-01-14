@@ -17,6 +17,11 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/partnerships",
+        destination: "https://tally.so/r/3Ev6XX",
+        permanent: false,
+      },
+      {
         source: "/start",
         destination: "https://eliza.gg/eliza/",
         permanent: false,

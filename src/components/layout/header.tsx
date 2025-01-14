@@ -29,10 +29,10 @@ export function Header() {
       >
         Explore
       </Link>
-      <Link
+      <a
         href="/partnerships"
         className={clsx(
-          "text-sm font-medium",
+          "text-sm font-medium flex items-center gap-1",
           mobile
             ? "-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-zinc-900 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900"
             : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
@@ -40,7 +40,8 @@ export function Header() {
         onClick={() => setMobileMenuOpen(false)}
       >
         Partnerships
-      </Link>
+        <ArrowTopRightOnSquareIcon className="h-3 w-3" />
+      </a>
       <a
         href="https://eliza.gg/eliza/"
         target="_blank"
